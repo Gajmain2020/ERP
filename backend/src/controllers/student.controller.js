@@ -97,12 +97,8 @@ export const loginStudent = asyncHandler(async (req, res) => {
       isDetailsFilled: student?.isDetailsFilled || false,
       authToken: jwt.sign(
         {
-          name: student.name,
-          userType: "student",
-          urn: student.urn,
-          id: student._id,
-          isVerified: student?.isVerified || false,
-          isDetailsFilled: student?.isDetailsFilled || false,
+          ...student,
+          usertype: "student",
         },
         process.env.ACCESS_TOKEN_SECRET,
         { expiresIn: process.env.ACCESS_TOKEN_EXPIRY }

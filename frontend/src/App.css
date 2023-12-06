@@ -1,0 +1,62 @@
+body {
+  background-color: black;
+}
+
+::-webkit-datetime-edit {
+  color: transparent;
+}
+:focus::-webkit-datetime-edit {
+  color: #000;
+}
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+.background_only {
+  background: url(./images/mainbackground.jpg);
+  background-position: center center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: black;
+  opacity: 0.18;
+  z-index: -2;
+}
+
+.heading {
+  border-bottom: solid 3px rgb(77, 77, 77);
+  border-radius: 200px;
+  margin-inline: auto;
+}
+
+.btn.MuiButton-containedPrimary {
+  background-image: linear-gradient(
+    to right,
+    #314755 0%,
+    #26a0da 51%,
+    #314755 100%
+  );
+  padding: 10px 35px;
+  text-align: center;
+  transition: 0.5s;
+  background-size: 200% auto;
+  color: white;
+  border-radius: 10px;
+  display: block;
+}
+
+.btn.MuiButton-containedPrimary:hover {
+  background-position: right center;
+  box-shadow: 0 0 20px #eee;
+  color: #fff;
+  text-decoration: none;
+}
