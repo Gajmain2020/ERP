@@ -1,4 +1,5 @@
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
 import Teachers from "../models/teacher.model.js";
 
@@ -135,6 +136,7 @@ export const deleteSingleTeacher = async (req, res) => {
     });
   }
 };
+
 export const deleteMultipleTeachers = async (req, res) => {
   try {
     const deleted = [];
@@ -154,6 +156,97 @@ export const deleteMultipleTeachers = async (req, res) => {
     return res.status(200).json({
       message: `Out of ${teachers.length} teachers ${deleted.length} has been deleted and ${notDeleted.length} can not be deleted`,
       success: true,
+    });
+  } catch (error) {
+    logOutError(error);
+    return res.status(500).json({
+      message: "Something went wrong. Please try again.",
+      success: false,
+    });
+  }
+};
+
+export const fetchAllTeachers = async (req, res) => {
+  try {
+    const teachers = await Teachers.find().select("-password");
+    return res.status(200).json({
+      success: true,
+      message: "Teachers sent successfully.",
+      data: {
+        teachers,
+      },
+    });
+  } catch (error) {
+    logOutError(error);
+    return res.status(500).json({
+      message: "Something went wrong. Please try again.",
+      success: false,
+    });
+  }
+};
+
+export const fetchTeachersByDepartment = async (req, res) => {
+  try {
+    const { department } = req.query;
+
+    const teachers = await Teachers.find({
+      department,
+    });
+    return res.status(200).json({
+      message: "Teachers sent successfully.",
+      success: true,
+      data: {
+        teachers,
+      },
+    });
+  } catch (error) {
+    logOutError(error);
+    return res.status(500).json({
+      message: "Something went wrong. Please try again.",
+      success: false,
+    });
+  }
+};
+
+export const loginTeacher = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    const teacherInDB = await Teachers.findOne({
+      email,
+    });
+
+    if (!teacherInDB) {
+      return res.status(404).json({
+        success: false,
+        message: "Invalid credentials.",
+      });
+    }
+
+    const isPasswordSame = await bcrypt.compare(password, teacherInDB.password);
+
+    if (!isPasswordSame) {
+      return res.status(409).json({
+        message: "Invalid credentials.",
+        success: false,
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Loged in successfully.",
+      data: {
+        id: teacherInDB._id,
+        urn: teacherInDB.urn,
+        authToken: jwt.sign(
+          {
+            ...teacherInDB,
+            usertype: "teacher",
+          },
+          process.env.ACCESS_TOKEN_SECRET,
+          { expiresIn: process.env.ACCESS_TOKEN_EXPIRY }
+        ),
+      },
     });
   } catch (error) {
     logOutError(error);
