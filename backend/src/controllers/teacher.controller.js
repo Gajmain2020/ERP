@@ -237,7 +237,8 @@ export const loginTeacher = async (req, res) => {
       message: "Loged in successfully.",
       data: {
         id: teacherInDB._id,
-        urn: teacherInDB.urn,
+        empId: teacherInDB.empId,
+        department: teacherInDB.department,
         authToken: jwt.sign(
           {
             ...teacherInDB,

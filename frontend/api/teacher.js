@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const teacherUrl = "http://localhost:3001/api/teacher";
+const teacherUrl = "http://localhost:8000/api/v1/teachers";
 
 const headers = {
   "content-type": "application/json",
@@ -17,7 +17,7 @@ export async function loginTeacher(data) {
   try {
     const response = await axios({
       headers,
-      url: teacherUrl + "/login",
+      url: teacherUrl + "/login-teacher",
       method: "POST",
       data,
     });

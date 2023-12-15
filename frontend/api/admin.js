@@ -1,8 +1,8 @@
 import axios from "axios";
 
-const AdminUrl = "http://localhost:3001/api/admin";
-const LibUrl = "http://localhost:3001/api/admin/library";
-const academicUrl = "http://localhost:3001/api/admin/academics";
+const AdminUrl = "http://localhost:8000/api/v1/admin";
+const LibUrl = "http://localhost:8000/api/v1/admin/library";
+const academicUrl = "http://localhost:8000/api/v1/admin/academics";
 
 const headers = {
   "content-type": "application/json",

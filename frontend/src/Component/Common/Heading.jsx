@@ -1,13 +1,11 @@
 /* eslint-disable react/prop-types */
-export default function Heading({ headingTitle }) {
+
+const Heading = ({ children }) => {
   return (
-    <div className="mx-auto w-full text-white">
-      <h1 className="text-4xl xs:text-2xl s:text-2xl flex gap-2 justify-center flex-col text-center font-main heading mx-auto">
-        {headingTitle}
-        <span className="text-sm  text-gray-300/80">
-          BIT DURG Online ERP Module
-        </span>
-      </h1>
+    <div className="lg:text-3xl md:text-2xl text-zinc-900 sm:text-xl xs:text-xl font-heading underline font-semibold flex justify-center item-center">
+      {children}
     </div>
   );
-}
+};
+
+export default Heading;

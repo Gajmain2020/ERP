@@ -71,6 +71,7 @@ export const loginStudent = asyncHandler(async (req, res) => {
 
   const student = await Students.findOne({ email });
 
+  console.log(email, password);
   if (!student) {
     return res.status(404).json({
       success: false,
@@ -93,6 +94,7 @@ export const loginStudent = asyncHandler(async (req, res) => {
     data: {
       id: student._id,
       urn: student.urn,
+      department: student.department,
       isVerified: student?.isVerified || false,
       isDetailsFilled: student?.isDetailsFilled || false,
       authToken: jwt.sign(

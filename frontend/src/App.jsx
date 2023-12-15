@@ -1,116 +1,116 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./App.css";
 import { Routes, Route } from "react-router-dom";
 
-import DeptRoute from "./Component/Admin/DeptRoute";
-import AdminLogin from "./Component/Admin/Login";
-import Homepage from "./Component/Homepage/Homepage";
 import Navbar from "./Component/Navbar/Navbar";
-import Complaints from "./Component/Constants/Complaints";
-import Notfound from "./Component/Notfound/Notfound";
-import ShowData from "./Component/ShowData/ShowData";
-import IssueBook from "./Component/Admin/Library/Helper/IssueBook";
-import EditRemoveStudent from "./Component/Admin/Academic/Helpers/EditRemoveStudent";
-import EditRemoveTeachers from "./Component/Admin/Academic/Helpers/EditRemoveTeachers";
-import CourseManagement from "./Component/Admin/AcademicDepartment/Helper/CourseManagement";
-import AssignTgToStudent from "./Component/Admin/AcademicDepartment/Helper/AssignTgToStudent";
-import AssignTG from "./Component/Admin/AcademicDepartment/Helper/AssignTG";
-import TimeTableManagement from "./Component/Admin/AcademicDepartment/Helper/TimeTableManagement";
-import StudentHomepage from "./Component/Student/StudentHomepage";
+import Homepage from "./Component/Homepage";
+import Notfound from "./Component/Common/NotFound";
+import Footer from "./Component/Common/Footer";
+import AdminLogin from "./Component/Admin/AdminLogin";
 import TeacherHomepage from "./Component/Teacher/TeacherHomepage";
-import ValidateStudents from "./Component/Teacher/Helper/ValidateStudents";
-import AddTeachersToCourses from "./Component/Admin/AcademicDepartment/Helper/AddTeachersToCourses";
-import ViewEditCourses from "./Component/Admin/AcademicDepartment/Helper/ViewEditCourses";
-import AddAttandance from "./Component/Teacher/Helper/AddAttandance";
-import AddAttandanceClass from "./Component/Teacher/Helper/AddAttandanceClass";
+import Sidebar from "./Component/Common/Sidebar";
+import Classes from "./Component/Teacher/Classes/Classes";
+import Attendence from "./Component/Teacher/Attendence/Attendence";
+import Assignment from "./Component/Teacher/Assignment/Assignment";
+import Testpaper from "./Component/Teacher/TestPaper/Testpaper";
+import Notice from "./Component/Teacher/Notice/Notice";
+import Announcement from "./Component/Teacher/Announcement/Announcement";
+import StudentValidation from "./Component/Teacher/StudentValidation/StudentValidation";
+import Complaints from "./Component/Teacher/Complaints/Complaints";
+import NotFoundLoggedIn from "./Component/Common/NotFoundLoggedIn";
+
+const notLoggedInStyles =
+  "flex justify-center mx-auto h-full min-h-screen  items-center";
+
+const loggedInStyles =
+  "flex justify-end items-start h-full min-h-screen w-full";
 
 function App() {
   const [token, setToken] = useState("");
 
+  useEffect(() => {
+    document.title = "BIT-Buddy";
+  }, []);
+
   return (
-    <>
+    <div className="relative">
       <div className="background_only"></div>
       <Navbar token={token} setToken={setToken} />
-      <div className="flex justify-center mb-10">
+      <div className={token === "" ? notLoggedInStyles : loggedInStyles}>
+        {token !== "" && <Sidebar token={token} setToken={setToken} />}
         <Routes>
-          <Route
-            path="/"
-            element={<Homepage token={token} setToken={setToken} />}
-          />
-          <Route path="/complaint" element={<Complaints token={token} />} />
-          <Route
-            path="/admin-login"
-            element={<AdminLogin token={token} setToken={setToken} />}
-          />
-          <Route path="/admin/:department/:id">
-            <Route
-              path=""
-              element={<DeptRoute token={token} setToken={setToken} />}
-            />
-            <Route path="course-management">
-              <Route
-                path=""
-                element={<CourseManagement token={token} setToken={setToken} />}
-              />
-              <Route path="edit-course" element={<ViewEditCourses />} />
-              <Route
-                path="add-teachers-to-courses"
-                element={<AddTeachersToCourses />}
-              />
-            </Route>
-            <Route
-              path="time-table-management"
-              element={
-                <TimeTableManagement token={token} setToken={setToken} />
-              }
-            />
-            <Route
-              path="assign-tg"
-              element={<AssignTG token={token} setToken={setToken} />}
-            />
-            <Route
-              path="assign-tg-to-students"
-              element={<AssignTgToStudent token={token} setToken={setToken} />}
-            />
-            <Route
-              path="edit-delete-students"
-              element={<EditRemoveStudent />}
-            />
-            <Route
-              path="edit-delete-teachers"
-              element={<EditRemoveTeachers />}
-            />
-            <Route path="issue-book" element={<IssueBook />} />
-          </Route>
-          <Route path="/teacher/:department/:id">
-            <Route
-              path=""
-              element={<TeacherHomepage token={token} setToken={setToken} />}
-            />
-            <Route
-              path="validate-students"
-              element={<ValidateStudents token={token} setToken={setToken} />}
-            />
-            <Route
-              path="add-attandance"
-              element={<AddAttandance token={token} setToken={setToken} />}
-            />
-            <Route
-              path="add-attandance/:query"
-              element={<AddAttandanceClass token={token} setToken={setToken} />}
-            />
-          </Route>
-          <Route path="/student/:department/:id">
-            <Route
-              path=""
-              element={<StudentHomepage token={token} setToken={setToken} />}
-            />
-          </Route>
-          <Route path="/Contact" element={<>hello world</>} />
-          <Route path="/show-data/:data" element={<ShowData />} />
-          <Route path="*" element={<Notfound />} />
+          {BasicRoutes(token, setToken)}
+          {TeacherRoutes(token, setToken)}
+          {token === "" && <Route path="*" element={<Notfound />} />}
+          {token !== "" && <Route path="*" element={<NotFoundLoggedIn />} />}
         </Routes>
       </div>
+
+      <Footer />
+    </div>
+  );
+}
+
+function BasicRoutes(token, setToken) {
+  return (
+    <>
+      <Route
+        path="/"
+        element={<Homepage token={token} setToken={setToken} />}
+      />
+      <Route
+        path="/admin-login"
+        element={<AdminLogin token={token} setToken={setToken} />}
+      />
+    </>
+  );
+}
+
+function TeacherRoutes(token, setToken) {
+  return (
+    <>
+      <Route path="teacher/:department/:id">
+        <Route
+          path=""
+          element={<TeacherHomepage token={token} setToken={setToken} />}
+        />
+        <Route
+          path="classes"
+          element={<Classes token={token} setToken={setToken} />}
+        />
+        <Route
+          path="attendence"
+          element={<Attendence token={token} setToken={setToken} />}
+        />
+        <Route
+          path="assignment"
+          element={<Attendence token={token} setToken={setToken} />}
+        />
+        <Route
+          path="assignments"
+          element={<Assignment token={token} setToken={setToken} />}
+        />
+        <Route
+          path="test-paper"
+          element={<Testpaper token={token} setToken={setToken} />}
+        />
+        <Route
+          path="notice"
+          element={<Notice token={token} setToken={setToken} />}
+        />
+        <Route
+          path="announcement"
+          element={<Announcement token={token} setToken={setToken} />}
+        />
+        <Route
+          path="student-validation"
+          element={<StudentValidation token={token} setToken={setToken} />}
+        />
+        <Route
+          path="complaints"
+          element={<Complaints token={token} setToken={setToken} />}
+        />
+      </Route>
     </>
   );
 }

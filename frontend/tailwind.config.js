@@ -11,7 +11,9 @@ export default {
       "2xl": "1536px",
     },
     fontFamily: {
-      main: "ubuntu",
+      heading: "Maitree",
+      sub: "Poppins",
+      main: "Karma",
     },
     extend: {},
   },

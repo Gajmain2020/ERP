@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const studentUrl = "http://localhost:3001/api/student";
+const studentUrl = "http://localhost:8000/api/v1/students";
 
 const headers = {
   "content-type": "application/json",
@@ -53,7 +53,7 @@ export async function loginStudent(data) {
   try {
     const response = await axios({
       headers,
-      url: studentUrl + "/login",
+      url: studentUrl + "/login-student",
       method: "POST",
       data,
     });
