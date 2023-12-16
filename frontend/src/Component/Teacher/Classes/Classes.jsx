@@ -30,7 +30,6 @@ function Classes({ token, setToken }) {
     },
   ];
 
-  const navigate = useNavigate();
   return (
     <Wrapper>
       <Heading>Classes</Heading>
@@ -101,7 +100,7 @@ function TableRow({ key, ind, semester, section, subject, numberOfStudents }) {
               type="button"
               className="px-2 py-1 rounded-md bg-zinc-400/70 text-zinc-950 font-medium hover:bg-zinc-400/90 transition-all active:ouline active:bg-zinc-500"
             >
-              Click Me!
+              View
             </button>
           </Link>
         </td>
