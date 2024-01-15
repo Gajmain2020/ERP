@@ -2,9 +2,6 @@ body {
   background-color: black;
 }
 
-::-webkit-datetime-edit {
-  color: transparent;
-}
 :focus::-webkit-datetime-edit {
   color: #000;
 }

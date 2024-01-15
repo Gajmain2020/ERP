@@ -4,6 +4,7 @@ import Heading from "../../Common/Heading";
 import { Link } from "react-router-dom";
 import { useState } from "react";
 import CloseIcon from "@mui/icons-material/Close";
+import ErrSuccSnackbar from "../../Common/ErrSuccSnackbar";
 
 //make api call to fetch all the assignment uploaded by respective teacher
 const dummyAssigments = [
@@ -30,24 +31,52 @@ const dummyAssigments = [
   },
 ];
 
+const initialAssignmentData = {
+  assignmentName: "",
+  subjectCode: "",
+  subjectShortName: "",
+  semester: "",
+  section: "",
+};
+
 function Assignment() {
   const [openAddAssignmentBackdrop, setOpenAddAssignmentBackdrop] =
     useState(false);
-  const [newAssignementData, setNewAssignementData] = useState({
-    assignmentName: "",
-    subjectCode: "",
-    subjectShortName: "",
-    semester: "",
-    section: "",
-  });
+  const [newAssignementData, setNewAssignementData] = useState(
+    initialAssignmentData
+  );
   const [file, setFile] = useState(null);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
 
   function handleAddNewAssignment() {
-    console.log("file", file);
-    console.log("assignmentdata", newAssignementData);
+    if (
+      newAssignementData === null ||
+      newAssignementData.assignmentName === "" ||
+      newAssignementData.subjectCode === "" ||
+      newAssignementData.subjectShortName === "" ||
+      newAssignementData.semester === "" ||
+      newAssignementData.section === ""
+    ) {
+      setErrorMessage("All fields are required to publish new assignment.");
+      return;
+    } else if (file === null) {
+      setErrorMessage("File is required to publish new assignment.");
+      return;
+    }
+
+    //! make api call to store that assignment data from frontend to backend and gather response
+    console.log("file::", file);
+    console.log("new Assignment data::", newAssignementData);
   }
   return (
     <Wrapper>
+      <ErrSuccSnackbar
+        setErrorMessage={setErrorMessage}
+        errorMessage={errorMessage}
+        setSuccessMessage={setSuccessMessage}
+        successMessage={successMessage}
+      />
       <Heading>Assignments</Heading>
 
       {/* upload button and its message */}
@@ -136,7 +165,6 @@ function Assignment() {
 }
 
 function TableRow({
-  key,
   ind,
   semester,
   section,
@@ -180,7 +208,7 @@ function BackdropComponent({
   const handleChange = (e) => {
     setNewAssignment((assign) => ({
       ...assign,
-      [e.target.name]: e.target.name,
+      [e.target.name]: e.target.value,
     }));
   };
 
@@ -197,7 +225,11 @@ function BackdropComponent({
           {/* CLOSE BUTTON */}
           <div className="flex items-between justify-end">
             <button
-              onClick={() => setOpen(false)}
+              onClick={() => {
+                setOpen(false);
+                setFile(null);
+                setNewAssignment(initialAssignmentData);
+              }}
               className="mr-2 mt-2 flex items-between bg-gray-700/80 rounded-sm px-2 py-0.5"
             >
               <CloseIcon color="error" />
@@ -273,7 +305,9 @@ function BackdropComponent({
                 onChange={handleChange}
                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
               >
-                <option selected>Select Semester</option>
+                <option selected value="">
+                  Select Semester
+                </option>
                 <option value="I">I</option>
                 <option value="II">II</option>
                 <option value="III">III</option>
@@ -297,7 +331,9 @@ function BackdropComponent({
                 onChange={handleChange}
                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
               >
-                <option selected>Select Section</option>
+                <option selected value="">
+                  Select Section
+                </option>
                 <option value="A">A</option>
                 <option value="B">B</option>
               </select>
@@ -310,6 +346,7 @@ function BackdropComponent({
                 Upload file
               </label>
               <input
+                accept=".pdf"
                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full py-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500
                 cursor-pointer focus:outline-none"
                 id="file"
