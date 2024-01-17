@@ -2,6 +2,10 @@ body {
   background-color: black;
 }
 
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
 :focus::-webkit-datetime-edit {
   color: #000;
 }
