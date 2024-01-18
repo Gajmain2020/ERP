@@ -1,7 +1,11 @@
+import fs from "fs";
+
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
 import Teachers from "../models/teacher.model.js";
+import Notices from "../models/notice.model.js";
+import Assignments from "../models/assignment.model.js";
 
 function logOutError(error) {
   console.log("ERROR:::");
@@ -248,6 +252,137 @@ export const loginTeacher = async (req, res) => {
           { expiresIn: process.env.ACCESS_TOKEN_EXPIRY }
         ),
       },
+    });
+  } catch (error) {
+    logOutError(error);
+    return res.status(500).json({
+      message: "Something went wrong. Please try again.",
+      success: false,
+    });
+  }
+};
+
+export const addNewNotice = async (req, res) => {
+  try {
+    const { noticeNumber, noticeSubject, semester } = req.body;
+    const { filename, destination } = req.file;
+
+    //check if notice is already existing or not
+    const isNoticeNumberTaken = await Notices.findOne({ noticeNumber });
+    if (isNoticeNumberTaken) {
+      return res.status(403).json({
+        message:
+          "Notice number already please change notice number and try again.",
+        success: false,
+      });
+    }
+
+    const fileSave = await Notices.create({
+      noticeNumber,
+      noticeSubject,
+      semester,
+      fileName: filename,
+      filePath: destination,
+    });
+
+    if (!fileSave) {
+      return res.status(500).json({
+        message: "Error while saving the file.",
+        success: false,
+      });
+    }
+
+    return res.status(201).json({
+      message: "Notice uploaded successfully",
+      success: true,
+    });
+  } catch (error) {
+    logOutError(error);
+    return res.status(500).json({
+      message: "Something went wrong. Please try again.",
+      success: false,
+    });
+  }
+};
+
+export const deleteNotice = async (req, res) => {
+  try {
+    const { _id } = req.query;
+    const noticeToDelete = await Notices.findById(_id);
+    if (!noticeToDelete) {
+      return res.status(404).json({
+        message: "The given notice was not found in database.",
+        success: false,
+      });
+    }
+    fs.unlink(
+      noticeToDelete.filePath + "/" + noticeToDelete.fileName,
+      (err) => {
+        if (err) {
+          console.log(err);
+          return res.status(403).json({
+            message: "Notice could not be deleted.",
+            success: false,
+          });
+        }
+      }
+    );
+    await Notices.deleteOne({ _id });
+    return res
+      .status(200)
+      .json({ message: "Notice deleted successfully.", success: true });
+  } catch (error) {
+    logOutError(error);
+    return res.status(500).json({
+      message: "Something went wrong. Please try again.",
+      success: false,
+    });
+  }
+};
+
+export const addNewAssignment = async (req, res) => {
+  try {
+    const { assignmentName, subjectCode, subjectShortName, semester, section } =
+      req.body;
+    const { filename, destination } = req.file;
+    console.log("hello i am here");
+
+    //check if notice is already existing or not
+    const isAssignmentAlreadyProvided = await Assignments.findOne({
+      assignmentName,
+      semester,
+      subjectCode,
+      semester,
+      section,
+    });
+    if (isAssignmentAlreadyProvided) {
+      return res.status(403).json({
+        message:
+          "Assignment already uploaded please try again later or delete the previous one.",
+        success: false,
+      });
+    }
+
+    const fileSave = await Assignments.create({
+      assignmentName,
+      subjectCode,
+      subjectShortName,
+      semester,
+      section,
+      fileName: filename,
+      filePath: destination,
+    });
+
+    if (!fileSave) {
+      return res.status(500).json({
+        message: "Error while saving the file.",
+        success: false,
+      });
+    }
+
+    return res.status(201).json({
+      message: "Assignment uploaded successfully",
+      success: true,
     });
   } catch (error) {
     logOutError(error);

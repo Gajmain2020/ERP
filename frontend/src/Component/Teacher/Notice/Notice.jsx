@@ -310,7 +310,7 @@ function BackdropComponent({
                 <option value="VIII">VIII</option>
               </select>
             </div>
-            <div>
+            {/* <div>
               <label
                 htmlFor="section"
                 className="block mb-1 mx-1 text-sm font-medium text-gray-900 dark:text-white"
@@ -330,7 +330,7 @@ function BackdropComponent({
                 <option value="I">A</option>
                 <option value="II">B</option>
               </select>
-            </div>
+            </div> */}
 
             <div>
               <label
