@@ -392,3 +392,49 @@ export const addNewAssignment = async (req, res) => {
     });
   }
 };
+
+export const deleteAssignment = async (req, res) => {
+  try {
+  } catch (error) {
+    logOutError(error);
+    return res.status(500).json({
+      message: "Something went wrong. Please try again.",
+      success: false,
+    });
+  }
+};
+
+export const searchStudent = async (req, res) => {
+  try {
+  } catch (error) {
+    logOutError(error);
+    return res.status(500).json({
+      message: "Something went wrong. Please try again.",
+      success: false,
+    });
+  }
+};
+
+export const getAllStudentsBySemester = async (req, res) => {
+  try {
+  } catch (error) {
+    logOutError(error);
+    return res.status(500).json({
+      message: "Something went wrong. Please try again.",
+      success: false,
+    });
+  }
+};
+
+export const getAllStudentsByDepartment = async (req, res) => {
+  try {
+  } catch (error) {
+    logOutError(error);
+    return res
+      .status(500)
+      .json({
+        message: "Something went wrong. Please try again.",
+        success: false,
+      });
+  }
+};
