@@ -2,22 +2,38 @@ import { useEffect, useState } from "react";
 import "./App.css";
 import { Routes, Route } from "react-router-dom";
 
-import Navbar from "./Component/Navbar/Navbar";
-import Homepage from "./Component/Homepage";
-import Notfound from "./Component/Common/NotFound";
-import Footer from "./Component/Common/Footer";
-import AdminLogin from "./Component/Admin/AdminLogin";
-import TeacherHomepage from "./Component/Teacher/TeacherHomepage";
-import Sidebar from "./Component/Common/Sidebar";
-import Classes from "./Component/Teacher/Classes/Classes";
-import Attendence from "./Component/Teacher/Attendence/Attendence";
-import Assignment from "./Component/Teacher/Assignment/Assignment";
-import Testpaper from "./Component/Teacher/TestPaper/Testpaper";
-import Notice from "./Component/Teacher/Notice/Notice";
-import Announcement from "./Component/Teacher/Announcement/Announcement";
-import StudentValidation from "./Component/Teacher/StudentValidation/StudentValidation";
-import Complaints from "./Component/Teacher/Complaints/Complaints";
-import NotFoundLoggedIn from "./Component/Common/NotFoundLoggedIn";
+import {
+  Navbar,
+  Homepage,
+  Notfound,
+  Footer,
+  AdminLogin,
+  TeacherHomepage,
+  Sidebar,
+  Classes,
+  Attendence,
+  Assignment,
+  Testpaper,
+  Notice,
+  Announcement,
+  StudentValidation,
+  Complaints,
+  NotFoundLoggedIn,
+  FindStudent,
+} from "./Constants/Teacher.constants";
+
+import {
+  StudentHomepage,
+  TimeTable,
+  AssesmentResults,
+  Results,
+  StudentAssignment,
+  PYQ,
+  StudentNotice,
+  Events,
+  Attendance,
+  StudentComplaints,
+} from "./Constants/Students.constants";
 
 const notLoggedInStyles =
   "flex justify-center mx-auto h-full min-h-screen  items-center";
@@ -41,6 +57,7 @@ function App() {
         <Routes>
           {BasicRoutes(token, setToken)}
           {TeacherRoutes(token, setToken)}
+          {StudentRoutes(token, setToken)}
           {token === "" && <Route path="*" element={<Notfound />} />}
           {token !== "" && <Route path="*" element={<NotFoundLoggedIn />} />}
         </Routes>
@@ -107,8 +124,58 @@ function TeacherRoutes(token, setToken) {
           element={<StudentValidation token={token} setToken={setToken} />}
         />
         <Route
+          path="find-student"
+          element={<FindStudent token={token} setToken={setToken} />}
+        />
+        <Route
           path="complaints"
           element={<Complaints token={token} setToken={setToken} />}
+        />
+      </Route>
+    </>
+  );
+}
+
+function StudentRoutes(token, setToken) {
+  return (
+    <>
+      <Route path="student/:department/:id">
+        <Route
+          path=""
+          element={<StudentHomepage token={token} setToken={setToken} />}
+        />
+        <Route
+          path="attendance"
+          element={<Attendance token={token} setToken={setToken} />}
+        />
+        <Route
+          path="time-table"
+          element={<TimeTable token={token} setToken={setToken} />}
+        />
+        <Route
+          path="assesment-results"
+          element={<AssesmentResults token={token} setToken={setToken} />}
+        />
+        <Route
+          path="results"
+          element={<Results token={token} setToken={setToken} />}
+        />
+        <Route
+          path="assignments"
+          element={<StudentAssignment token={token} setToken={setToken} />}
+        />
+        <Route path="pyq" element={<PYQ token={token} setToken={setToken} />} />
+        <Route
+          path="notice"
+          element={<StudentNotice token={token} setToken={setToken} />}
+        />
+        <Route
+          path="events"
+          element={<Events token={token} setToken={setToken} />}
+        />
+        <Route
+          path="complaints"
+          element={<StudentComplaints token={token} setToken={setToken} />}
         />
       </Route>
     </>
