@@ -6,6 +6,7 @@ import jwt from "jsonwebtoken";
 import Teachers from "../models/teacher.model.js";
 import Notices from "../models/notice.model.js";
 import Assignments from "../models/assignment.model.js";
+import Students from "../models/student.model.js";
 
 function logOutError(error) {
   console.log("ERROR:::");
@@ -406,6 +407,69 @@ export const deleteAssignment = async (req, res) => {
 
 export const searchStudent = async (req, res) => {
   try {
+    const { name, urn, crn, department } = req.query;
+    let students = [];
+    let studentsToSend = [];
+
+    if (
+      (urn === undefined || urn === "") &&
+      (crn === undefined || crn === "") &&
+      (name === undefined || name === "")
+    ) {
+      return res.status(400).json({
+        message: "Atleast one field must be provided.",
+        success: false,
+      });
+    }
+
+    if (name !== undefined && name !== "") {
+      const studentsByName = await Students.find({
+        name: { $regex: name, $options: "i" },
+        department,
+      });
+      // students.push(...studentsByName);
+
+      students.push(
+        ...studentsByName.filter((student) => {
+          if (!students.includes(student._id)) {
+            return student;
+          }
+        })
+      );
+    }
+    if (crn !== undefined && crn !== "") {
+      const studentsByCrn = await Students.find({
+        crn: { $regex: crn, $options: "i" },
+        department,
+      });
+      students.push(
+        ...studentsByCrn.filter((student) => {
+          if (!students.includes(student._id)) {
+            return student;
+          }
+        })
+      );
+    }
+    if (urn !== undefined && urn !== "") {
+      const studentsByUrn = await Students.find({
+        urn: { $regex: urn, $options: "i" },
+        department,
+      });
+      students.push(
+        ...studentsByUrn.filter((student) => {
+          if (!students.includes(student._id)) {
+            return student;
+          }
+        })
+      );
+    }
+
+    return res.status(200).json({
+      message: `${students.length} student(s) found.`,
+      success: true,
+      students,
+      numberOfStudents: students.length,
+    });
   } catch (error) {
     logOutError(error);
     return res.status(500).json({
@@ -417,6 +481,19 @@ export const searchStudent = async (req, res) => {
 
 export const getAllStudentsBySemester = async (req, res) => {
   try {
+    const { department, semester } = req.query;
+
+    const students = await Students.find({
+      semester,
+      department,
+    }).select("-password");
+
+    return res.status(200).json({
+      message: "Students sent successfully.",
+      success: true,
+      numberOfStudents: students.length,
+      students,
+    });
   } catch (error) {
     logOutError(error);
     return res.status(500).json({
@@ -428,13 +505,20 @@ export const getAllStudentsBySemester = async (req, res) => {
 
 export const getAllStudentsByDepartment = async (req, res) => {
   try {
+    const { department } = req.query;
+    const students = await Students.find({ department }).select("-password");
+
+    return res.status(200).json({
+      message: "Students sent successfully.",
+      students,
+      success: true,
+      numberOfStudents: students.length,
+    });
   } catch (error) {
     logOutError(error);
-    return res
-      .status(500)
-      .json({
-        message: "Something went wrong. Please try again.",
-        success: false,
-      });
+    return res.status(500).json({
+      message: "Something went wrong. Please try again.",
+      success: false,
+    });
   }
 };

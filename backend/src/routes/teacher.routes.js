@@ -12,6 +12,8 @@ import {
   deleteNotice,
   deleteAssignment,
   searchStudent,
+  getAllStudentsByDepartment,
+  getAllStudentsBySemester,
 } from "../controllers/teacher.controller.js";
 import { uploadNotice } from "../middlewares/multerNotice.middleware.js";
 import { uploadAssignment } from "../middlewares/multerAssignment.middleware.js";
@@ -38,7 +40,9 @@ router
 router.route("/delete-assignment").delete(deleteAssignment);
 
 //students related routes
-router.route("/search-student").get(searchStudent);
-router.route("/get-all-students-by-semester").get(getAllStudentsBySemester);
+router.route("/search-students").get(searchStudent);
+router
+  .route("/get-all-students-by-semester-department")
+  .get(getAllStudentsBySemester);
 router.route("/get-all-students-by-department").get(getAllStudentsByDepartment);
 export default router;
