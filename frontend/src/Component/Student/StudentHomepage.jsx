@@ -42,7 +42,7 @@ const INITIAL_STUDENT_DETAILS = {
 // eslint-disable-next-line react/prop-types
 export default function StudentHomepage({ token }) {
   const navigate = useNavigate();
-  const id = location.pathname.split("/")[3];
+  // const id = location.pathname.split("/")[3];
 
   const [date, setDate] = useState(new Date());
   const [data, setData] = useState(null);
