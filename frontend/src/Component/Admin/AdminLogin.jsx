@@ -20,10 +20,6 @@ export default function AdminLogin({ token, setToken }) {
   });
 
   useEffect(() => {
-    document.title = "Admin Login";
-  }, []);
-
-  useEffect(() => {
     if (token !== "") {
       const decode = jwtDecode(token);
       navigate(`/${decode.userType}/${decode.department}/${decode.id}`);

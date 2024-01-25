@@ -35,10 +35,6 @@ export default function Homepage({ setToken }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useEffect(() => {
-    document.title = "Homepage";
-  }, []);
-
   const options = {
     animationData,
     loop: true,
@@ -141,8 +137,7 @@ export default function Homepage({ setToken }) {
               <TextField
                 required
                 fullWidth
-                label="Email"
-                placeholder="jone.doe@mail.com"
+                placeholder="Email"
                 className="text-slate-950 bg-white rounded-lg"
                 name="email"
                 onChange={(e) =>
@@ -161,7 +156,7 @@ export default function Homepage({ setToken }) {
                   required
                   type={showPassword ? "text" : "password"}
                   fullWidth
-                  label="Password"
+                  placeholder="Password"
                   name="password"
                   className="text-slate-950 bg-white rounded-lg"
                   onChange={(e) =>
