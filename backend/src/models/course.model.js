@@ -7,7 +7,11 @@ const courseSchema = new mongoose.Schema(
     courseCode: reqString,
     courseName: reqString,
     courseShortName: reqString,
-    semester: reqString,
+    semester: {
+      type: String,
+      required: true,
+      enum: ["I", "II", "III", "IV", "V", "VI", "VII", "VIII"],
+    },
     department: reqString,
     courseType: {
       type: String,

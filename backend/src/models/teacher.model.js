@@ -18,11 +18,11 @@ const teacherSchema = Schema(
       type: Boolean,
       default: false,
     },
-    subjectsTaken: {
+    coursesTaken: {
       type: [
         {
-          subjectName: String,
-          subjectCode: String,
+          courseName: String,
+          courseCode: String,
           semester: String,
         },
       ],
@@ -32,9 +32,10 @@ const teacherSchema = Schema(
     classesTaken: {
       type: [
         {
-          subjectShortName: String,
+          courseShortName: String,
           semester: String,
           section: String,
+          period: Number,
         },
       ],
       default: [],
