@@ -28,9 +28,7 @@ export default function Homepage({ setToken }) {
   useEffect(() => {
     if (localStorage.getItem("authToken")) {
       const decode = jwtDecode(localStorage.getItem("authToken"));
-      navigate(
-        `${decode.usertype}/${decode._doc.department}/${decode._doc._id}`
-      );
+      navigate(`${decode.userType}/${decode.department}/${decode.id}`);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
