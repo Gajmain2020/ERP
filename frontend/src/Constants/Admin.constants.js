@@ -9,7 +9,16 @@ import AdminComplaints from "../Component/Admin/Complaints/AdminComplaints";
 const QuickLinkStyles =
   "bg-slate-700/30 my-2 border border-slate-900 rounded-md py-1.5 hover:bg-slate-700/60 transition hover:text-white text-gray-300 ease-in-out duration-200 hover:shadow-xl shadow-cyan-600";
 
+const INTIAL_COURSE_DATA = {
+  courseName: "",
+  courseCode: "",
+  courseShortName: "",
+  semester: "",
+  courseType: "core",
+};
+
 export {
+  INTIAL_COURSE_DATA,
   AdminHomepage,
   AdminTimeTable,
   Students,

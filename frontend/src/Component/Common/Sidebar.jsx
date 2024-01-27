@@ -209,7 +209,6 @@ function Sidebar() {
 
 function AdminSidebar({ department }) {
   if (Deparatments.includes(department)) {
-    console.log("hello world");
     return <DepartmentAdminSidebar department={department} />;
   }
   return <>hello world</>;
