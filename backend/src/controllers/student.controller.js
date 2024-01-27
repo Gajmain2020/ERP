@@ -91,21 +91,19 @@ export const loginStudent = asyncHandler(async (req, res) => {
   return res.status(200).json({
     message: "Login successful.",
     success: true,
-    data: {
-      id: student._id,
-      urn: student.urn,
-      department: student.department,
-      isVerified: student?.isVerified || false,
-      isDetailsFilled: student?.isDetailsFilled || false,
-      authToken: jwt.sign(
-        {
-          ...student,
-          usertype: "student",
-        },
-        process.env.ACCESS_TOKEN_SECRET,
-        { expiresIn: process.env.ACCESS_TOKEN_EXPIRY }
-      ),
-    },
+    id: student._id,
+    urn: student.urn,
+    department: student.department,
+    isVerified: student?.isVerified || false,
+    isDetailsFilled: student?.isDetailsFilled || false,
+    authToken: jwt.sign(
+      {
+        ...student,
+        userType: "student",
+      },
+      process.env.ACCESS_TOKEN_SECRET,
+      { expiresIn: process.env.ACCESS_TOKEN_EXPIRY }
+    ),
   });
 });
 

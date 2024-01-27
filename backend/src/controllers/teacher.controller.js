@@ -240,19 +240,18 @@ export const loginTeacher = async (req, res) => {
     return res.status(200).json({
       success: true,
       message: "Loged in successfully.",
-      data: {
-        id: teacherInDB._id,
-        empId: teacherInDB.empId,
-        department: teacherInDB.department,
-        authToken: jwt.sign(
-          {
-            ...teacherInDB,
-            usertype: "teacher",
-          },
-          process.env.ACCESS_TOKEN_SECRET,
-          { expiresIn: process.env.ACCESS_TOKEN_EXPIRY }
-        ),
-      },
+
+      id: teacherInDB._id,
+      empId: teacherInDB.empId,
+      department: teacherInDB.department,
+      authToken: jwt.sign(
+        {
+          ...teacherInDB,
+          userType: "teacher",
+        },
+        process.env.ACCESS_TOKEN_SECRET,
+        { expiresIn: process.env.ACCESS_TOKEN_EXPIRY }
+      ),
     });
   } catch (error) {
     logOutError(error);
