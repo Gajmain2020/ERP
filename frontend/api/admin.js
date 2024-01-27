@@ -39,3 +39,29 @@ export async function addCourseAPI(data) {
     return error.response.data;
   }
 }
+
+export async function fetchCoursesAPI(department) {
+  try {
+    const response = await axios({
+      headers,
+      url: AdminUrl + `/${department}/fetch-courses?department=${department}`,
+      method: "GET",
+    });
+    return response.data;
+  } catch (error) {
+    return error.response.data;
+  }
+}
+export async function fetchAllCoursesAPI(department) {
+  try {
+    const response = await axios({
+      headers,
+      url:
+        AdminUrl + `/${department}/fetch-all-courses?department=${department}`,
+      method: "GET",
+    });
+    return response.data;
+  } catch (error) {
+    return error.response.data;
+  }
+}

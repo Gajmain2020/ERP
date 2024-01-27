@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
 import Heading from "../../Common/Heading";
@@ -7,10 +7,11 @@ import Wrapper from "../../Common/Wrapper";
 import {
   QuickLinkStyles,
   INTIAL_COURSE_DATA,
+  CoursesTableHeader,
 } from "../../../Constants/Admin.constants";
 import { INPUT_STYLE } from "../../../Constants/Students.constants";
 import CloseIcon from "@mui/icons-material/Close";
-import { addCourseAPI } from "../../../../api/admin";
+import { addCourseAPI, fetchCoursesAPI } from "../../../../api/admin";
 import ErrSuccSnackbar from "../../Common/ErrSuccSnackbar";
 
 export default function Course() {
@@ -24,9 +25,21 @@ export default function Course() {
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [apiCalled, setApiCalled] = useState(false);
+  const [courses, setCoruses] = useState(null);
+
+  useEffect(() => {
+    if (department && !courses) {
+      console.log("hello world");
+      setApiCalled(() => true);
+      fetchCoursesAPI(department)
+        .then((res) => setCoruses(() => res.courses))
+        .catch((err) => setErrorMessage(err))
+        .finally(() => setApiCalled(() => false));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   function handleAddNewCourse() {
-    console.log(courseData);
     if (
       courseData.courseCode === "" ||
       courseData.courseShortName === "" ||
@@ -73,7 +86,97 @@ export default function Course() {
         </Link>
       </div>
       {/* COMPONENT TO DISPLAY SOME COURSES */}
-      table component here
+      <div className="relative rounded-lg overflow-x-auto">
+        <table className=" w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+          <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700/80 dark:text-gray-200">
+            <tr>
+              {CoursesTableHeader.map((header) => (
+                <th key={header} scope="col" className="px-3 py-4">
+                  {header}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {courses === null && (
+              <tr className="bg-gray-500/80 border-b dark:border-gray-700 dark:text-gray-200">
+                <td colSpan={6} className="text-lg">
+                  Loading...
+                </td>
+              </tr>
+            )}
+            {courses && courses.length === 0 && (
+              <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                <td colSpan={6} className="text-lg">
+                  No Courses To Be Displayed{" "}
+                </td>
+              </tr>
+            )}
+
+            {courses &&
+              courses.length > 0 &&
+              courses.map((course, idx) => (
+                <tr
+                  key={course._id}
+                  onClick={() => alert(course._id)}
+                  className="bg-gray-500/80 hover:bg-gray-700/70 transition duration-200 border-b dark:border-gray-700 dark:text-gray-200"
+                >
+                  <th scope="row" className="px-6 py-2 whitespace-nowrap ">
+                    {idx + 1}
+                  </th>
+                  <td className="px-6 font-medium py-2 text-white">
+                    {course.courseCode}
+                  </td>
+                  <td className="px-6 py-2">{course.courseName}</td>
+                  <td className="px-6 py-2">{course.courseShortName}</td>
+                  <td className="px-6 py-2">{course.semester}</td>
+                  <td className="px-6 py-2">
+                    {course.courseType === "core"
+                      ? "Core"
+                      : course.courseType === "elective"
+                      ? "Prof. Elective"
+                      : "Open Elective"}
+                  </td>
+                </tr>
+              ))}
+            {courses && courses.length === 5 && (
+              <tr className="bg-gray-500/80 border-b dark:border-gray-700 dark:text-gray-200">
+                <td colSpan={6}>
+                  <span className="flex justify-center m-1.5 items-center">
+                    <Link
+                      to="all-courses"
+                      className="relative inline-flex items-center justify-center p-4 px-6 py-2 overflow-hidden font-medium text-slate-600 transition duration-300 ease-out border-2 border-slate-900 rounded-full shadow-md group"
+                    >
+                      <span className="absolute inset-0 flex items-center justify-center w-full h-full text-white duration-300 -translate-x-full bg-slate-300/50 rounded-full group-hover:translate-x-0 ease">
+                        <svg
+                          className="w-6 h-6"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M14 5l7 7m0 0l-7 7m7-7H3"
+                          ></path>
+                        </svg>
+                      </span>
+                      <span className="absolute flex items-center justify-center w-full h-full text-slate-900 transition-all duration-300 transform group-hover:translate-x-full ease">
+                        View All{" "}
+                      </span>
+                      <span className="relative invisible">View All</span>
+                    </Link>
+                  </span>
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      {/* UTILITIES LIKE BACKDROP AND SNACKBAR */}
       {openAddNewCourse && (
         <BackDropComponent
           courseData={courseData}

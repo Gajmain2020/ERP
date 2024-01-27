@@ -96,7 +96,6 @@ export const loginAdmin = async (req, res) => {
       { expiresIn: process.env.ACCESS_TOKEN_EXPIRY }
     );
 
-    res.cookie("hello", "hello world");
     return res.status(200).json({
       authToken: token,
       message: "Login successful.",

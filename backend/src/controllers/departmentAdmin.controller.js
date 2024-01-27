@@ -168,3 +168,41 @@ export const removeTeacherFromCourse = async (req, res) => {
     });
   }
 };
+
+export const fetchCourses = async (req, res, next) => {
+  try {
+    const { department } = req.query;
+    const courses = await Courses.find({ department })
+      .sort({ createdAt: -1 })
+      .limit(5);
+
+    return res.status(200).json({
+      message: "Courses sent successfully.",
+      success: true,
+      courses,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Something went wrong. Please try again.",
+      success: false,
+    });
+  }
+};
+
+export const fetchAllCourses = async (req, res) => {
+  try {
+    const { department } = req.query;
+    const courses = await Courses.find({ department }).sort({ createdAt: -1 });
+
+    return res.status(200).json({
+      message: "Courses sent successfully",
+      success: true,
+      courses,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Something went wrong. Please try again.",
+      success: false,
+    });
+  }
+};

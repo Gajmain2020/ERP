@@ -17,7 +17,17 @@ const INTIAL_COURSE_DATA = {
   courseType: "core",
 };
 
+const CoursesTableHeader = [
+  "S. No.",
+  "Course Code",
+  "Course Name",
+  "Short Name",
+  "Semester",
+  "Course Type",
+];
+
 export {
+  CoursesTableHeader,
   INTIAL_COURSE_DATA,
   AdminHomepage,
   AdminTimeTable,
