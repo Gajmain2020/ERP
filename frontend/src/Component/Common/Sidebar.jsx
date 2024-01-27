@@ -16,6 +16,10 @@ import EventNoteIcon from "@mui/icons-material/EventNote";
 import FactCheckIcon from "@mui/icons-material/FactCheck";
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 import AssessmentIcon from "@mui/icons-material/Assessment";
+import Diversity2Icon from "@mui/icons-material/Diversity2";
+import SupervisedUserCircleIcon from "@mui/icons-material/SupervisedUserCircle";
+
+import { Deparatments } from "../../Constants/Constants";
 
 const teacherSidebarOption = [
   {
@@ -134,6 +138,48 @@ const studentSidebarOption = [
   },
 ];
 
+const departmentAdminSidebarOption = [
+  {
+    title: "Divider",
+  },
+  {
+    title: "Courses",
+    icon: <SchoolIcon />,
+    url: "courses",
+  },
+  {
+    title: "Time Table",
+    icon: <EventNoteIcon />,
+    url: "time-table",
+  },
+  {
+    title: "Divider",
+  },
+  {
+    title: "Students",
+    icon: <SupervisedUserCircleIcon />,
+    url: "students",
+  },
+  {
+    title: "Teachers",
+    icon: <Diversity2Icon />,
+    url: "teachers",
+  },
+  {
+    title: "Divider",
+  },
+  {
+    title: "Notice",
+    icon: <NotificationImportantIcon />,
+    url: "notice",
+  },
+  {
+    title: "Complaints",
+    icon: <GppMaybeIcon />,
+    url: "complaints",
+  },
+];
+
 const sidebarButtonStyle =
   "w-full px-3 flex gap-5  text-md hover:bg-zinc-400/60 transition-all delay-150 hover:text-black rounded-lg py-2 active:outline-none active:ring active:ring-zinc-900/50 font-semibold items-center cursor-pointer";
 
@@ -146,21 +192,66 @@ const active = " bg-zinc-200/70 text-zinc-900";
 var baseUrl = location.pathname.split("/");
 baseUrl = baseUrl.slice(0, 4).join("/") + "/";
 
-function Sidebar({ token, setToken }) {
+function Sidebar() {
   const location = useLocation().pathname.split("/");
   const userType = location[1];
-
+  const department = location[2];
   return (
     <>
       {userType === "teacher" && <TeacherSidebar />}
       {userType === "student" && <StudentSidebar />}
-      {userType === "admin" && <AdminSidebar />}
+      {(userType === "admin" || userType === "Admin") && (
+        <AdminSidebar department={department} />
+      )}
     </>
   );
 }
 
-function AdminSidebar() {
+function AdminSidebar({ department }) {
+  if (Deparatments.includes(department)) {
+    console.log("hello world");
+    return <DepartmentAdminSidebar department={department} />;
+  }
   return <>hello world</>;
+}
+
+function DepartmentAdminSidebar({ department }) {
+  const navigate = useNavigate();
+  return (
+    <>
+      <div className="flex overflow-auto">
+        <div className={sidebarComponentStyle}>
+          <div
+            onClick={() => navigate(baseUrl)}
+            className={
+              !location.pathname.split("/")[4]
+                ? sidebarButtonStyle + active
+                : sidebarButtonStyle
+            }
+          >
+            <div className="ml-2 p-0">
+              <HomeIcon />
+            </div>
+            <div className="h-full truncate">Homepage</div>
+          </div>
+
+          {departmentAdminSidebarOption.map((option) => (
+            <>
+              {option.title !== "Divider" ? (
+                <SidebarButton
+                  title={option.title}
+                  url={option.url}
+                  icon={option.icon}
+                />
+              ) : (
+                <Divider />
+              )}
+            </>
+          ))}
+        </div>
+      </div>
+    </>
+  );
 }
 
 function TeacherSidebar() {

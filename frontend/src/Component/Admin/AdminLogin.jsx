@@ -50,9 +50,10 @@ export default function AdminLogin({ token, setToken }) {
           setApiCalled(false);
           return;
         }
-        localStorage.setItem("authToken", JSON.stringify(res.data.authToken));
-        setToken(res.data.authToken);
-        navigate(`/admin/${res.data.department}/${res.data.id}`);
+        localStorage.setItem("authToken", JSON.stringify(res.authToken));
+        setToken(res.authToken);
+        navigate(`/admin/${res.department}/${res.id}`);
+
         return;
       })
       .catch((error) => {

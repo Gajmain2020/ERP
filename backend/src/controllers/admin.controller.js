@@ -98,9 +98,11 @@ export const loginAdmin = async (req, res) => {
 
     res.cookie("hello", "hello world");
     return res.status(200).json({
-      token,
+      authToken: token,
       message: "Login successful.",
       success: true,
+      department: isEmailExisting.department,
+      id: isEmailExisting._id,
     });
 
     console.log("This is admin login api end point");

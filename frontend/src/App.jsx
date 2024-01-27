@@ -34,6 +34,15 @@ import {
   Attendance,
   StudentComplaints,
 } from "./Constants/Students.constants";
+import {
+  AdminComplaints,
+  AdminHomepage,
+  AdminNotice,
+  AdminTimeTable,
+  Course,
+  Students,
+  Teachers,
+} from "./Constants/Admin.constants";
 
 const notLoggedInStyles =
   "flex justify-center mx-auto h-full min-h-screen  items-center";
@@ -58,6 +67,7 @@ function App() {
           {BasicRoutes(token, setToken)}
           {TeacherRoutes(token, setToken)}
           {StudentRoutes(token, setToken)}
+          {AdminRoutes(token, setToken)}
           {token === "" && <Route path="*" element={<Notfound />} />}
           {token !== "" && <Route path="*" element={<NotFoundLoggedIn />} />}
         </Routes>
@@ -176,6 +186,43 @@ function StudentRoutes(token, setToken) {
         <Route
           path="complaints"
           element={<StudentComplaints token={token} setToken={setToken} />}
+        />
+      </Route>
+    </>
+  );
+}
+
+function AdminRoutes(token, setToken) {
+  return (
+    <>
+      <Route path="admin/:department/:id">
+        <Route
+          path=""
+          element={<AdminHomepage token={token} setToken={setToken} />}
+        />
+        <Route
+          path="courses"
+          element={<Course token={token} setToken={setToken} />}
+        />
+        <Route
+          path="time-table"
+          element={<AdminTimeTable token={token} setToken={setToken} />}
+        />
+        <Route
+          path="students"
+          element={<Students token={token} setToken={setToken} />}
+        />
+        <Route
+          path="teachers"
+          element={<Teachers token={token} setToken={setToken} />}
+        />
+        <Route
+          path="notice"
+          element={<AdminNotice token={token} setToken={setToken} />}
+        />
+        <Route
+          path="complaints"
+          element={<AdminComplaints token={token} setToken={setToken} />}
         />
       </Route>
     </>
