@@ -18,6 +18,18 @@ input[type="number"] {
   -moz-appearance: textfield;
 }
 
+.delete-button {
+  color: rgb(253, 121, 121);
+  transition: all;
+  transition-duration: 200ms;
+}
+.delete-button:hover {
+  color: rgb(249, 78, 78);
+  outline: solid 2px black;
+  outline-offset: 2px;
+  border-radius: 50%;
+}
+
 .background_only {
   background: url(./images/mainbackground.jpg);
   background-position: center center;

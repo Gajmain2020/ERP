@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 import { useEffect, useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 import Heading from "../../Common/Heading";
 import Wrapper from "../../Common/Wrapper";
@@ -15,7 +15,6 @@ import { addCourseAPI, fetchCoursesAPI } from "../../../../api/admin";
 import ErrSuccSnackbar from "../../Common/ErrSuccSnackbar";
 
 export default function Course() {
-  const navigate = useNavigate();
   const department = useLocation().pathname.split("/")[2];
   const [openAddNewCourse, setOpenAddNewCourse] = useState(false);
   const [courseData, setCourseData] = useState({
@@ -29,7 +28,6 @@ export default function Course() {
 
   useEffect(() => {
     if (department && !courses) {
-      console.log("hello world");
       setApiCalled(() => true);
       fetchCoursesAPI(department)
         .then((res) => setCoruses(() => res.courses))

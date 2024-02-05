@@ -65,3 +65,16 @@ export async function fetchAllCoursesAPI(department) {
     return error.response.data;
   }
 }
+
+export async function deleteCourseAPI(department, courseId) {
+  try {
+    const response = await axios({
+      headers,
+      url: AdminUrl + `/${department}/delete-course?courseId=${courseId}`,
+      method: "DELETE",
+    });
+    return response.data;
+  } catch (error) {
+    return error.response.data;
+  }
+}

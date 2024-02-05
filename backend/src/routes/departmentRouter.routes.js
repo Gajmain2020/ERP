@@ -6,6 +6,7 @@ import {
   removeTeacherFromCourse,
   testApi,
   fetchAllCourses,
+  deleteCourse,
 } from "../controllers/departmentAdmin.controller.js";
 
 const router = Router();
@@ -17,5 +18,6 @@ router.route("/remove-teacher-from-course").patch(removeTeacherFromCourse);
 
 router.route("/fetch-courses").get(fetchCourses);
 router.route("/fetch-all-courses").get(fetchAllCourses);
+router.route("/delete-course").delete(deleteCourse);
 
 export default router;

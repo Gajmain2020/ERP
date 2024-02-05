@@ -193,11 +193,35 @@ export const fetchAllCourses = async (req, res) => {
   try {
     const { department } = req.query;
     const courses = await Courses.find({ department }).sort({ createdAt: -1 });
-
     return res.status(200).json({
       message: "Courses sent successfully",
       success: true,
       courses,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Something went wrong. Please try again.",
+      success: false,
+    });
+  }
+};
+
+export const deleteCourse = async (req, res) => {
+  try {
+    const { courseId } = req.query;
+
+    const course = await Courses.findOneAndDelete({ _id: courseId });
+
+    if (!course) {
+      return res.status(404).json({
+        message: "Course with gven id is not found.",
+        success: false,
+      });
+    }
+
+    return res.status(200).json({
+      message: "Courses deleted successfully.",
+      success: true,
     });
   } catch (error) {
     return res.status(500).json({

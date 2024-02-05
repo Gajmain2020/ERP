@@ -43,6 +43,7 @@ import {
   Students,
   Teachers,
 } from "./Constants/Admin.constants";
+import AllCourses from "./Component/Admin/Course/AllCourses";
 
 const notLoggedInStyles =
   "flex justify-center mx-auto h-full min-h-screen  items-center";
@@ -200,10 +201,16 @@ function AdminRoutes(token, setToken) {
           path=""
           element={<AdminHomepage token={token} setToken={setToken} />}
         />
-        <Route
-          path="courses"
-          element={<Course token={token} setToken={setToken} />}
-        />
+        <Route path="courses">
+          <Route
+            path=""
+            element={<Course token={token} setToken={setToken} />}
+          />
+          <Route
+            path="all-courses"
+            element={<AllCourses token={token} setToken={setToken} />}
+          />
+        </Route>
         <Route
           path="time-table"
           element={<AdminTimeTable token={token} setToken={setToken} />}
