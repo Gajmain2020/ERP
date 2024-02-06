@@ -92,7 +92,7 @@ export default function AllCourses() {
               courses.map((course, idx) => (
                 <tr
                   key={course._id}
-                  onClick={() => alert(course._id)}
+                  onClick={() => naviate(course._id)}
                   className="bg-gray-500/80 hover:bg-gray-700/70 transition duration-200 border-b dark:border-gray-700 dark:text-gray-200"
                 >
                   <th scope="row" className="px-6 py-2 whitespace-nowrap ">
