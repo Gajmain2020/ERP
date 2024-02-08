@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import { useState } from "react";
 
 import SearchTwoToneIcon from "@mui/icons-material/SearchTwoTone";
@@ -148,6 +149,37 @@ function CreateNewTimeTableComponent({
   searchValue,
   department,
 }) {
+  const [timeTable, setTimeTable] = useState([
+    ...Array.from({ length: 5 }, () =>
+      Array.from({ length: 7 }, () => ({
+        subjectShortName: ``,
+        teacherName: ``,
+      }))
+    ),
+    Array.from({ length: 5 }, () => ({
+      subjectShortName: ``,
+      teacherName: ``,
+    })),
+  ]);
+
+  const days = [
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+  ];
+  const periods = [
+    { number: "I", timeSlot: "10:00AM-10:50AM" },
+    { number: "II", timeSlot: "10:50AM-11:40AM" },
+    { number: "III", timeSlot: "11:40AM-12:30PM" },
+    { number: "IV", timeSlot: "12:30PM-01:20PM" },
+    { number: "V", timeSlot: "02:10PM-03:00PM" },
+    { number: "VI", timeSlot: "03:00PM-03:50PM" },
+    { number: "VII", timeSlot: "03:50PM-04:40PM" },
+  ];
+
   return (
     <>
       {!createNewTimeTable && (
@@ -164,7 +196,7 @@ function CreateNewTimeTableComponent({
       )}
       {createNewTimeTable && (
         <>
-          <div className="flex gap-3 items-center justify-around">
+          <div className="grid grid-cols-1 lg:grid-cols-3 md:grid-cols-3 lg:gap-3 md:gap-3 gap-1 items-center justify-around">
             <div className="bg-gray-300/70 flex justify-center w-full px-2 py-2 rounded-md font-semibold">
               Semester: {searchValue.semester}
             </div>
@@ -173,6 +205,77 @@ function CreateNewTimeTableComponent({
             </div>
             <div className="bg-gray-300/70 flex justify-center w-full px-2 py-2 rounded-md font-semibold">
               Department: {department}
+            </div>
+          </div>
+
+          <div className="hidden lg:flex md:flex">
+            <div className="w-full">
+              <table className="w-full border border-gray-400">
+                <thead>
+                  <tr>
+                    <th className="border border-gray-400"></th>
+                    {periods.map((period, index) => (
+                      <th
+                        key={index}
+                        className="border border-gray-400 px-2 py-2"
+                      >
+                        <span className="grid">
+                          <span>{period.number}</span>
+                          <span className="text-xs">{period.timeSlot}</span>
+                        </span>
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {days.map((day, idx) => (
+                    <tr key={idx}>
+                      <td className="border font-semibold border-gray-400 px-4 py-2">
+                        {day}
+                      </td>
+                      {timeTable[idx].map((period, index) => (
+                        <td
+                          className="border text-center border-gray-400 px-4 py-1"
+                          key={index}
+                        >
+                          <div className="grid">
+                            <span>
+                              {period.subjectShortName === ""
+                                ? "hello1"
+                                : "hello2"}
+                            </span>
+                            <span className="text-sm">
+                              {period.teacherName === "" ? (
+                                <button onClick={() => {}}>say hello</button>
+                              ) : (
+                                "hello2"
+                              )}
+                            </span>
+                          </div>
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                  <tr></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* DO NOT DISPLAY TABLE IN SMALL DEVICES  */}
+          <div className="flex lg:hidden md:hidden">
+            <div className="flex justify-center items-center h-full w-full ">
+              <div className="max-w-md p-8 bg-white rounded-lg shadow-lg">
+                <h2 className="text-2xl font-bold mb-4">Oops!</h2>
+                <p className="text-gray-700 mb-4">
+                  This task or feature cannot be accessed on small screen
+                  devices. Please login with a computer or tablet to access this
+                  feature.
+                </p>
+                <p className="text-gray-700 mb-4">
+                  If you believe this is an error, please contact support.
+                </p>
+              </div>
             </div>
           </div>
         </>
