@@ -139,3 +139,19 @@ export async function addTeacherToCourseAPI(teacher, course, department) {
     return error.response.data;
   }
 }
+
+export async function removeTeacherFromCourseAPI(teacher, course, department) {
+  try {
+    const response = await axios({
+      headers,
+      url:
+        AdminUrl +
+        `/${department}/remove-teacher-from-course?courseCode=${course.courseCode}&teacherId=${teacher._id}`,
+      method: "PATCH",
+    });
+
+    return response.data;
+  } catch (error) {
+    return error.response.data;
+  }
+}

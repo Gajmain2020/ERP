@@ -4,6 +4,7 @@ import { Link, useLocation } from "react-router-dom";
 
 import CloseIcon from "@mui/icons-material/Close";
 import ControlPointTwoToneIcon from "@mui/icons-material/ControlPointTwoTone";
+import RemoveCircleTwoToneIcon from "@mui/icons-material/RemoveCircleTwoTone";
 
 import Heading from "../../Common/Heading";
 import Wrapper from "../../Common/Wrapper";
@@ -17,6 +18,7 @@ import {
   addCourseAPI,
   addTeacherToCourseAPI,
   fetchCoursesAPI,
+  removeTeacherFromCourseAPI,
   searchCourseAPI,
   searchTeacherAPI,
 } from "../../../../api/admin";
@@ -455,6 +457,40 @@ function BackDropComponentToAddTeacherToCourse({
           return;
         }
         setSuccessMessage(res.message);
+        setCourse((course) => ({
+          ...course,
+          takenBy: [
+            ...course.takenBy,
+            {
+              teacherName: teacher.name,
+              teacherId: teacher._id,
+            },
+          ],
+        }));
+      })
+      .catch((err) => {
+        setErrorMessage(() => err.message);
+      })
+      .finally(() => {
+        setApiCalled(() => false);
+      });
+  }
+
+  function handleRemoveTeacherClick(teacher) {
+    setApiCalled(() => true);
+    removeTeacherFromCourseAPI(teacher, course, department)
+      .then((res) => {
+        if (!res.success) {
+          setErrorMessage(res.message);
+          return;
+        }
+        setSuccessMessage(res.message);
+        setCourse((course) => ({
+          ...course,
+          takenBy: course.takenBy.filter(
+            (tea) => tea.teacherId !== teacher._id
+          ),
+        }));
       })
       .catch((err) => {
         setErrorMessage(() => err.message);
@@ -480,7 +516,7 @@ function BackDropComponentToAddTeacherToCourse({
             </button>
           </div>
 
-          <Heading>Add Teacher To Course</Heading>
+          <Heading>Add/Remove Teacher To Course</Heading>
 
           {/* MAIN FORM FOR INPUT */}
           <div className="px-2 mt-3 grid gap-3 lg:grid-cols-2 grid-cols-1">
@@ -526,13 +562,28 @@ function BackDropComponentToAddTeacherToCourse({
                       </u>
                     </div>
                   </div>
-                  {!cont && (
+                  {!cont ? (
                     <div className="row-span-2 flex items-center">
                       <button
                         onClick={() => setCont(() => true)}
                         className="py-1 bg-sky-300/50 px-2 rounded-md outline-sky-500/80 outline hover:text-white hover:bg-sky-500/80 transition font-semibold hover:shadow-lg"
                       >
                         Continue
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="row-span-2 flex items-center">
+                      <button
+                        onClick={() => {
+                          setCourse(() => null);
+                          setCont(() => false);
+                          setTeacherName(() => "");
+                          setCourseCode(() => "");
+                          setTeachers(() => null);
+                        }}
+                        className="py-0 bg-red-300/20 px-2 rounded-md outline-red-500/80 outline hover:text-white hover:bg-red-500/80 transition font-semibold hover:shadow-lg"
+                      >
+                        Cancel
                       </button>
                     </div>
                   )}
@@ -570,6 +621,7 @@ function BackDropComponentToAddTeacherToCourse({
                         )}
                         handleAddTeacherClick={handleAddTeacherClick}
                         teacher={teacher}
+                        handleRemoveTeacherClick={handleRemoveTeacherClick}
                       />
                     </div>
                   ))}
@@ -582,16 +634,22 @@ function BackDropComponentToAddTeacherToCourse({
   );
 }
 
-function TeacherCard({ teacher, handleAddTeacherClick, isAlreadyAlloted }) {
+function TeacherCard({
+  teacher,
+  handleAddTeacherClick,
+  isAlreadyAlloted,
+  handleRemoveTeacherClick,
+}) {
   return (
     <div
       onClick={() => {
         if (!isAlreadyAlloted) handleAddTeacherClick(teacher);
+        else handleRemoveTeacherClick(teacher);
       }}
       className={
         isAlreadyAlloted
-          ? "border rounded-md px-2 py-2 border-dashed border-sky-200 bg-green-400/40 transition duration-200 cursor-not-allowed"
-          : "border rounded-md px-2 py-2 border-dashed border-sky-200 hover:bg-sky-400/20 transition duration-200 cursor-pointer hover:font-semibold"
+          ? "border rounded-md px-2 py-2 border-dashed border-sky-200 bg-green-400/40 transition duration-200 cursor-pointer hover:bg-red-300/30"
+          : "border rounded-md px-2 py-2 border-dashed border-sky-200 hover:bg-green-400/50 transition duration-200 cursor-pointer hover:font-semibold"
       }
     >
       <div className="flex justify-between items-center">
@@ -603,11 +661,13 @@ function TeacherCard({ teacher, handleAddTeacherClick, isAlreadyAlloted }) {
             <span>{teacher.isTG ? "TG" : "Not TG"}</span>
           </span>
         </span>
-        {!isAlreadyAlloted && (
-          <span className="hover:text-lime-900/70 transition duration-150 hover:scale-125">
+        <span className="hover:text-lime-900/70 transition duration-150 hover:scale-125">
+          {!isAlreadyAlloted ? (
             <ControlPointTwoToneIcon />
-          </span>
-        )}
+          ) : (
+            <RemoveCircleTwoToneIcon />
+          )}
+        </span>
       </div>
     </div>
   );
