@@ -10,6 +10,7 @@ import {
   searchTimeTable,
   searchCourse,
   searchTeacher,
+  fetchAllCoursesBySemester,
 } from "../controllers/departmentAdmin.controller.js";
 
 const router = Router();
@@ -22,6 +23,7 @@ router.route("/search-teacher").get(searchTeacher);
 
 router.route("/fetch-courses").get(fetchCourses);
 router.route("/fetch-all-courses").get(fetchAllCourses);
+router.route("/fetch-all-courses-by-semester").get(fetchAllCoursesBySemester);
 router.route("/delete-course").delete(deleteCourse);
 router.route("/search-course").get(searchCourse);
 

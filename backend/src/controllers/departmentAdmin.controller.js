@@ -207,6 +207,24 @@ export const fetchAllCourses = async (req, res) => {
     });
   }
 };
+export const fetchAllCoursesBySemester = async (req, res) => {
+  try {
+    const { department, semester } = req.query;
+    const courses = await Courses.find({ department, semester }).sort({
+      createdAt: -1,
+    });
+    return res.status(200).json({
+      message: "Courses sent successfully",
+      success: true,
+      courses,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Something went wrong. Please try again.",
+      success: false,
+    });
+  }
+};
 
 export const deleteCourse = async (req, res) => {
   try {

@@ -52,6 +52,20 @@ export async function fetchCoursesAPI(department) {
     return error.response.data;
   }
 }
+export async function fetchAllCoursesBySemesterAPI(semester, department) {
+  try {
+    const response = await axios({
+      headers,
+      url:
+        AdminUrl +
+        `/${department}/fetch-all-courses-by-semester?department=${department}&semester=${semester}`,
+      method: "GET",
+    });
+    return response.data;
+  } catch (error) {
+    return error.response.data;
+  }
+}
 export async function fetchAllCoursesAPI(department) {
   try {
     const response = await axios({

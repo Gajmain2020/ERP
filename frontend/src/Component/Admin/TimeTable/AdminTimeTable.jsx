@@ -1,18 +1,40 @@
 /* eslint-disable react/prop-types */
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import SearchTwoToneIcon from "@mui/icons-material/SearchTwoTone";
 
 import Heading from "../../Common/Heading";
 import Wrapper from "../../Common/Wrapper";
 import ErrSuccSnackbar from "../../Common/ErrSuccSnackbar";
-import { searchTimeTableAPI } from "../../../../api/admin";
+import {
+  fetchAllCoursesBySemesterAPI,
+  searchTimeTableAPI,
+} from "../../../../api/admin";
 import { useParams } from "react-router-dom";
+import Loading from "../../Common/Loading";
 
 const InitialSearchValue = {
   semester: "",
   section: "",
 };
+
+const days = [
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+];
+const periods = [
+  { number: "I", timeSlot: "10:00AM-10:50AM" },
+  { number: "II", timeSlot: "10:50AM-11:40AM" },
+  { number: "III", timeSlot: "11:40AM-12:30PM" },
+  { number: "IV", timeSlot: "12:30PM-01:20PM" },
+  { number: "V", timeSlot: "02:10PM-03:00PM" },
+  { number: "VI", timeSlot: "03:00PM-03:50PM" },
+  { number: "VII", timeSlot: "03:50PM-04:40PM" },
+];
 
 export default function AdminTimeTable() {
   const department = useParams().department;
@@ -161,24 +183,22 @@ function CreateNewTimeTableComponent({
       teacherName: ``,
     })),
   ]);
+  const [courses, setCourses] = useState(null);
 
-  const days = [
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Saturday",
-  ];
-  const periods = [
-    { number: "I", timeSlot: "10:00AM-10:50AM" },
-    { number: "II", timeSlot: "10:50AM-11:40AM" },
-    { number: "III", timeSlot: "11:40AM-12:30PM" },
-    { number: "IV", timeSlot: "12:30PM-01:20PM" },
-    { number: "V", timeSlot: "02:10PM-03:00PM" },
-    { number: "VI", timeSlot: "03:00PM-03:50PM" },
-    { number: "VII", timeSlot: "03:50PM-04:40PM" },
-  ];
+  useEffect(() => {
+    fetchAllCoursesBySemesterAPI(searchValue.semester, department)
+      .then((res) => {
+        if (!res.success) {
+          alert(res.message);
+          return;
+        }
+        setCourses(() => res.courses);
+      })
+      .catch((err) => {
+        alert(err.message);
+      })
+      .finally(() => {});
+  }, []);
 
   return (
     <>
@@ -210,55 +230,58 @@ function CreateNewTimeTableComponent({
 
           <div className="hidden lg:flex md:flex">
             <div className="w-full">
-              <table className="w-full border border-gray-400">
-                <thead>
-                  <tr>
-                    <th className="border border-gray-400"></th>
-                    {periods.map((period, index) => (
-                      <th
-                        key={index}
-                        className="border border-gray-400 px-2 py-2"
-                      >
-                        <span className="grid">
-                          <span>{period.number}</span>
-                          <span className="text-xs">{period.timeSlot}</span>
-                        </span>
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {days.map((day, idx) => (
-                    <tr key={idx}>
-                      <td className="border font-semibold border-gray-400 px-4 py-2">
-                        {day}
-                      </td>
-                      {timeTable[idx].map((period, index) => (
-                        <td
-                          className="border text-center border-gray-400 px-4 py-1"
+              {!courses && <Loading />}
+              {courses && (
+                <table className="w-full border border-gray-400">
+                  <thead className="rounded-md bg-gray-400/30">
+                    <tr>
+                      <th className="border border-gray-400"></th>
+                      {periods.map((period, index) => (
+                        <th
                           key={index}
+                          className="border border-gray-400 px-2 py-2"
                         >
-                          <div className="grid">
-                            <span>
-                              {period.subjectShortName === ""
-                                ? "hello1"
-                                : "hello2"}
-                            </span>
-                            <span className="text-sm">
-                              {period.teacherName === "" ? (
-                                <button onClick={() => {}}>say hello</button>
-                              ) : (
-                                "hello2"
-                              )}
-                            </span>
-                          </div>
-                        </td>
+                          <span className="grid">
+                            <span>{period.number}</span>
+                            <span className="text-xs">{period.timeSlot}</span>
+                          </span>
+                        </th>
                       ))}
                     </tr>
-                  ))}
-                  <tr></tr>
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {days.map((day, idx) => (
+                      <tr key={idx}>
+                        <td className="border bg-gray-400/30 font-semibold border-gray-400 px-4 py-2">
+                          {day}
+                        </td>
+                        {timeTable[idx].map((period, index) => (
+                          <td
+                            className="border text-center border-gray-400 px-4 py-1"
+                            key={index}
+                          >
+                            <div className="grid">
+                              <span>
+                                {period.subjectShortName === ""
+                                  ? "hello1"
+                                  : "hello2"}
+                              </span>
+                              <span className="text-sm">
+                                {period.teacherName === "" ? (
+                                  <button onClick={() => {}}>say hello</button>
+                                ) : (
+                                  "hello2"
+                                )}
+                              </span>
+                            </div>
+                          </td>
+                        ))}
+                      </tr>
+                    ))}
+                    <tr></tr>
+                  </tbody>
+                </table>
+              )}
             </div>
           </div>
 
