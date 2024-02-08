@@ -1,5 +1,7 @@
 import Courses from "../models/course.model.js";
 import Teachers from "../models/teacher.model.js";
+import TimeTableMaps from "../models/timeTableMap.model.js";
+import TimeTables from "../models/timeTable.model.js";
 
 function logOutError(error) {
   console.log("ERROR:::");
@@ -224,6 +226,95 @@ export const deleteCourse = async (req, res) => {
       success: true,
     });
   } catch (error) {
+    return res.status(500).json({
+      message: "Something went wrong. Please try again.",
+      success: false,
+    });
+  }
+};
+
+export const searchTimeTable = async (req, res) => {
+  try {
+    const { section, semester, department } = req.query;
+
+    const timeTableMap = await TimeTableMaps.findOne({
+      department,
+      section,
+      semester,
+    });
+
+    if (!timeTableMap) {
+      return res.status(404).json({
+        message: "No time table found for given section and semester.",
+        success: false,
+      });
+    }
+
+    const timeTable = await TimeTables.findById(timeTableMap.timeTable);
+
+    return res.status(200).json({
+      message: "Time table for given semester and section already exists.",
+      success: true,
+      timeTable,
+      timeTableMap,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Something went wrong. Please try again.",
+      success: false,
+    });
+  }
+};
+
+export const searchCourse = async (req, res) => {
+  try {
+    const { courseCode, department } = req.query;
+
+    const course = await Courses.findOne({
+      courseCode,
+    });
+    if (!course) {
+      return res.status(404).json({
+        message: "Course with specified course code not found.",
+        success: false,
+      });
+    }
+    return res.status(200).json({
+      message: "Course sent successfully.",
+      course,
+      success: true,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Something went wrong. Please try again.",
+      success: false,
+    });
+  }
+};
+
+export const searchTeacher = async (req, res) => {
+  try {
+    const { teacherName } = req.query;
+
+    const teachers = await Teachers.find({
+      name: { $regex: teacherName, $options: "i" },
+    });
+
+    if (!teachers || teachers.length === 0) {
+      return res.status(404).json({
+        message: "No teachers found.",
+        teachers,
+        success: false,
+      });
+    }
+
+    return res.status(200).json({
+      teachers,
+      message: "Teachers sent successfully.",
+      success: true,
+    });
+  } catch (error) {
+    logOutError(error);
     return res.status(500).json({
       message: "Something went wrong. Please try again.",
       success: false,

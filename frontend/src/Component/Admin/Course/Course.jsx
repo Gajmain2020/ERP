@@ -2,6 +2,9 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 
+import CloseIcon from "@mui/icons-material/Close";
+import ControlPointTwoToneIcon from "@mui/icons-material/ControlPointTwoTone";
+
 import Heading from "../../Common/Heading";
 import Wrapper from "../../Common/Wrapper";
 import {
@@ -10,13 +13,19 @@ import {
   CoursesTableHeader,
 } from "../../../Constants/Admin.constants";
 import { INPUT_STYLE } from "../../../Constants/Students.constants";
-import CloseIcon from "@mui/icons-material/Close";
-import { addCourseAPI, fetchCoursesAPI } from "../../../../api/admin";
+import {
+  addCourseAPI,
+  addTeacherToCourseAPI,
+  fetchCoursesAPI,
+  searchCourseAPI,
+  searchTeacherAPI,
+} from "../../../../api/admin";
 import ErrSuccSnackbar from "../../Common/ErrSuccSnackbar";
 
 export default function Course() {
   const department = useLocation().pathname.split("/")[2];
   const [openAddNewCourse, setOpenAddNewCourse] = useState(false);
+  const [openAddTeacherToCourse, setOpenAddTeacherToCourse] = useState(false);
   const [courseData, setCourseData] = useState({
     ...INTIAL_COURSE_DATA,
     department,
@@ -69,12 +78,18 @@ export default function Course() {
     <Wrapper>
       <Heading>Courses</Heading>
       {/* BUTTON CONTAINER TO SEARCH AND ADD NEW COURSE */}
-      <div className="grid gap-2 grid-cols-2">
+      <div className="grid gap-2 grid-cols-3 font-semibold">
         <button
           onClick={() => setOpenAddNewCourse(() => true)}
           className={QuickLinkStyles}
         >
           Add New Course
+        </button>
+        <button
+          onClick={() => setOpenAddTeacherToCourse(() => true)}
+          className={QuickLinkStyles}
+        >
+          Add Teachers To Course
         </button>
         <Link
           to="all-courses"
@@ -184,6 +199,14 @@ export default function Course() {
           apiCalled={apiCalled}
         />
       )}
+      {openAddTeacherToCourse && (
+        <BackDropComponentToAddTeacherToCourse
+          setOpen={setOpenAddTeacherToCourse}
+          setErrorMessage={setErrorMessage}
+          setSuccessMessage={setSuccessMessage}
+          department={department}
+        />
+      )}
       {(errorMessage !== "" || successMessage !== "") && (
         <ErrSuccSnackbar
           errorMessage={errorMessage}
@@ -196,7 +219,7 @@ export default function Course() {
   );
 }
 
-//
+// new course addition
 function BackDropComponent({
   setOpen,
   setCourseData,
@@ -354,6 +377,237 @@ function BackDropComponent({
             </button>
           </div>
         </div>
+      </div>
+    </div>
+  );
+}
+
+//backdrop component for adding teacher to course
+function BackDropComponentToAddTeacherToCourse({
+  setOpen,
+  setErrorMessage,
+  department,
+  setSuccessMessage,
+}) {
+  const [apiCalled, setApiCalled] = useState(false);
+  const [course, setCourse] = useState(null);
+  const [courseCode, setCourseCode] = useState("");
+  const [cont, setCont] = useState(false);
+  const [teacherName, setTeacherName] = useState("");
+  const [teachers, setTeachers] = useState(null);
+
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape") {
+      setOpen(() => false);
+    }
+  });
+
+  function handleSearchCourse() {
+    console.log("i am clicked");
+    if (courseCode === "") {
+      setErrorMessage("Course Code is required.");
+      return;
+    }
+    setApiCalled(() => true);
+    searchCourseAPI(courseCode, department)
+      .then((res) => {
+        if (!res.success) {
+          setErrorMessage(res.message);
+          return;
+        }
+        setCourse(res.course);
+      })
+      .catch((err) => {
+        setErrorMessage(() => err.message);
+      })
+      .finally(() => {
+        setApiCalled(() => false);
+      });
+  }
+
+  function handleSearchTeacher() {
+    if (teacherName === "") {
+      setErrorMessage("Teacher name is required.");
+      return;
+    }
+    setApiCalled(() => true);
+    searchTeacherAPI(teacherName, department)
+      .then((res) => {
+        if (!res.success) {
+          setErrorMessage(res.message);
+          setTeachers(res.teachers);
+          return;
+        }
+        setTeachers(res.teachers);
+      })
+      .catch((err) => {
+        setErrorMessage(() => err.message);
+      })
+      .finally(() => setApiCalled(() => false));
+  }
+
+  function handleAddTeacherClick(teacher) {
+    setApiCalled(() => true);
+    addTeacherToCourseAPI(teacher, course, department)
+      .then((res) => {
+        if (!res.success) {
+          setErrorMessage(res.message);
+          return;
+        }
+        setSuccessMessage(res.message);
+      })
+      .catch((err) => {
+        setErrorMessage(() => err.message);
+      })
+      .finally(() => {
+        setApiCalled(() => false);
+      });
+  }
+
+  return (
+    <div className="fixed top-0 left-0 w-[100%] h-[100vh] backdrop-blur bg-gray-900/50">
+      <div className="flex justify-center items-center h-[100%]">
+        <div className="bg-gray-100/40 lg:h-3/4 md:h-3/4 lg:w-1/2 overflow-auto md:1/2 sm:w-3/4 xs:w-5/6 xs:h-[90vh] sm:[80vh] rounded-md ">
+          {/* CLOSE BUTTON */}
+          <div className="flex items-between justify-end">
+            <button
+              onClick={() => {
+                setOpen(() => false);
+              }}
+              className="mr-2 mt-2 flex items-between bg-gray-700/80 rounded-sm px-2 py-0.5"
+            >
+              <CloseIcon color="error" />
+            </button>
+          </div>
+
+          <Heading>Add Teacher To Course</Heading>
+
+          {/* MAIN FORM FOR INPUT */}
+          <div className="px-2 mt-3 grid gap-3 lg:grid-cols-2 grid-cols-1">
+            {!cont && (
+              <div className="col-span-2 flex gap-2">
+                <input
+                  className={INPUT_STYLE + " flex-1"}
+                  placeholder="Course Code (Case Sensitive)"
+                  name="courseCode"
+                  onChange={(e) => setCourseCode(() => e.target.value)}
+                />
+                <button
+                  onClick={handleSearchCourse}
+                  disabled={apiCalled}
+                  className="border rounded-md w-20 mx-auto hover:bg-gray-500/60 hover:text-white transition shadow-md"
+                >
+                  Search
+                </button>
+              </div>
+            )}
+            {course && (
+              <>
+                <div className="lg:gap-3 px-10 grid grid-cols-1 lg:grid-cols-2 bg-sky-200/50 py-1 rounded-md col-span-2 overflow-auto">
+                  <div className="font-semibold">
+                    <div>
+                      Course Code:&nbsp;
+                      <u>{course.courseCode}</u>
+                    </div>
+                    <div>
+                      Course Short Name:&nbsp;
+                      <u>{course.courseShortName}</u>
+                    </div>
+                  </div>
+                  <div className="font-semibold">
+                    <div>
+                      Course Name:&nbsp;
+                      <u>{course.courseName}</u>
+                    </div>
+                    <div>
+                      Department:&nbsp;
+                      <u>
+                        {course.department} ({course.courseType})
+                      </u>
+                    </div>
+                  </div>
+                  {!cont && (
+                    <div className="row-span-2 flex items-center">
+                      <button
+                        onClick={() => setCont(() => true)}
+                        className="py-1 bg-sky-300/50 px-2 rounded-md outline-sky-500/80 outline hover:text-white hover:bg-sky-500/80 transition font-semibold hover:shadow-lg"
+                      >
+                        Continue
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </>
+            )}
+            {cont && (
+              <div className="col-span-2 flex gap-2 w-full">
+                <input
+                  className={INPUT_STYLE + " flex-1"}
+                  placeholder="Teacher Name"
+                  name="teacherName"
+                  onChange={(e) => setTeacherName(() => e.target.value)}
+                />
+                <button
+                  onClick={handleSearchTeacher}
+                  disabled={apiCalled}
+                  className="border rounded-md w-20 mx-auto hover:bg-gray-500/60 hover:text-white transition shadow-md"
+                >
+                  Search
+                </button>
+              </div>
+            )}
+            {teachers && teachers.length === 0 && (
+              <div>no teachers to display</div>
+            )}
+            <div className="col-span-2">
+              <div className="grid grid-cols-1 gap-2 lg:grid-cols-2 ">
+                {teachers &&
+                  teachers.map((teacher) => (
+                    <div key={teacher._id}>
+                      <TeacherCard
+                        isAlreadyAlloted={course.takenBy.find(
+                          (tea) => tea.teacherId === teacher._id
+                        )}
+                        handleAddTeacherClick={handleAddTeacherClick}
+                        teacher={teacher}
+                      />
+                    </div>
+                  ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function TeacherCard({ teacher, handleAddTeacherClick, isAlreadyAlloted }) {
+  return (
+    <div
+      onClick={() => {
+        if (!isAlreadyAlloted) handleAddTeacherClick(teacher);
+      }}
+      className={
+        isAlreadyAlloted
+          ? "border rounded-md px-2 py-2 border-dashed border-sky-200 bg-green-400/40 transition duration-200 cursor-not-allowed"
+          : "border rounded-md px-2 py-2 border-dashed border-sky-200 hover:bg-sky-400/20 transition duration-200 cursor-pointer hover:font-semibold"
+      }
+    >
+      <div className="flex justify-between items-center">
+        <span>
+          <span className="font-semibold">{teacher.name}</span>
+          <span className="flex text-sm gap-3">
+            <span>{teacher.empId}</span>
+            <span>{teacher.department}</span>
+            <span>{teacher.isTG ? "TG" : "Not TG"}</span>
+          </span>
+        </span>
+        {!isAlreadyAlloted && (
+          <span className="hover:text-lime-900/70 transition duration-150 hover:scale-125">
+            <ControlPointTwoToneIcon />
+          </span>
+        )}
       </div>
     </div>
   );

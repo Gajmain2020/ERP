@@ -78,3 +78,64 @@ export async function deleteCourseAPI(department, courseId) {
     return error.response.data;
   }
 }
+
+export async function searchTimeTableAPI(department, semester, section) {
+  try {
+    const response = await axios({
+      headers,
+      url:
+        AdminUrl +
+        `/${department}/search-time-table?section=${section}&semester=${semester}&department=${department}`,
+      method: "GET",
+    });
+    return response.data;
+  } catch (error) {
+    return error.response.data;
+  }
+}
+
+export async function searchCourseAPI(courseCode, department) {
+  try {
+    const response = await axios({
+      headers,
+      url:
+        AdminUrl +
+        `/${department}/search-course?courseCode=${courseCode}&department=${department}`,
+      methhod: "GET",
+    });
+    return response.data;
+  } catch (error) {
+    return error.response.data;
+  }
+}
+
+export async function searchTeacherAPI(teacherName, department) {
+  try {
+    const response = await axios({
+      headers,
+      url:
+        AdminUrl +
+        `/${department}/search-teacher?teacherName=${teacherName}&department=${department}`,
+      method: "GET",
+    });
+    return response.data;
+  } catch (error) {
+    return error.response.data;
+  }
+}
+
+export async function addTeacherToCourseAPI(teacher, course, department) {
+  try {
+    const response = await axios({
+      headers,
+      url:
+        AdminUrl +
+        `/${department}/add-teacher-to-course?courseCode=${course.courseCode}&teacherId=${teacher._id}`,
+      method: "PATCH",
+    });
+
+    return response.data;
+  } catch (error) {
+    return error.response.data;
+  }
+}
