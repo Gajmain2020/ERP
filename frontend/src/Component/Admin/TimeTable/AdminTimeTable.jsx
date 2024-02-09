@@ -174,13 +174,17 @@ function CreateNewTimeTableComponent({
   const [timeTable, setTimeTable] = useState([
     ...Array.from({ length: 5 }, () =>
       Array.from({ length: 7 }, () => ({
-        subjectShortName: ``,
-        teacherName: ``,
+        courseShortName: "",
+        courseId: "",
+        teacherName: "",
+        teacherId: "",
       }))
     ),
     Array.from({ length: 5 }, () => ({
-      subjectShortName: ``,
-      teacherName: ``,
+      courseShortName: "",
+      courseId: "",
+      teacherName: "",
+      teacherId: "",
     })),
   ]);
   const [courses, setCourses] = useState(null);
@@ -199,6 +203,38 @@ function CreateNewTimeTableComponent({
       })
       .finally(() => {});
   }, []);
+
+  function handleTimeTableChange(rowIndex, columnIndex, event) {
+    //if the courses is selected then run this
+    if (event.target.name === "course") {
+      const [courseShortName, courseId] = event.target.value.split("#");
+      setTimeTable((timeTable) =>
+        timeTable.map((row, rIndex) => {
+          if (rIndex === rowIndex) {
+            // Update the specific row
+            return row.map((cell, cIndex) => {
+              if (cIndex === columnIndex) {
+                //make change over here for updation
+                return {
+                  ...cell,
+                  courseShortName,
+                  courseId,
+                };
+              }
+              return cell;
+            });
+          }
+          return row;
+        })
+      );
+      return;
+    }
+
+    //if the teacher is selected then run this
+    if (event.target.name === "teacherName") {
+      console.log("hello bhai");
+    }
+  }
 
   return (
     <>
@@ -232,14 +268,14 @@ function CreateNewTimeTableComponent({
             <div className="w-full">
               {!courses && <Loading />}
               {courses && (
-                <table className="w-full border border-gray-400">
-                  <thead className="rounded-md bg-gray-400/30">
+                <table className="w-full border bg-gray-200/80 border-gray-400">
+                  <thead className="rounded-md bg-gray-700/30">
                     <tr>
-                      <th className="border border-gray-400"></th>
+                      <th className="border border-gray-700"></th>
                       {periods.map((period, index) => (
                         <th
                           key={index}
-                          className="border border-gray-400 px-2 py-2"
+                          className="border border-gray-700 px-2 py-2"
                         >
                           <span className="grid">
                             <span>{period.number}</span>
@@ -252,25 +288,84 @@ function CreateNewTimeTableComponent({
                   <tbody>
                     {days.map((day, idx) => (
                       <tr key={idx}>
-                        <td className="border bg-gray-400/30 font-semibold border-gray-400 px-4 py-2">
+                        <td className="border bg-gray-700/30 font-semibold border-gray-700 px-4 py-2">
                           {day}
                         </td>
                         {timeTable[idx].map((period, index) => (
                           <td
-                            className="border text-center border-gray-400 px-4 py-1"
+                            className="border text-center border-gray-400"
                             key={index}
                           >
-                            <div className="grid">
+                            <div className="grid gap-0.5 py-1 px-1 text-sm">
                               <span>
-                                {period.subjectShortName === ""
-                                  ? "hello1"
-                                  : "hello2"}
+                                {period.courseShortName === "" ? (
+                                  <select
+                                    required
+                                    name="course"
+                                    className="font-semibold px-1 h-full w-full bg-transparent outline-1 outline-dashed"
+                                    onChange={(e) =>
+                                      handleTimeTableChange(idx, index, e)
+                                    }
+                                  >
+                                    <option selected value="">
+                                      Select Subject
+                                    </option>
+                                    {courses.map((course) => (
+                                      <option
+                                        key={course._id}
+                                        value={`${course.courseShortName}#${course._id}`}
+                                      >
+                                        {course.courseShortName} -&nbsp;
+                                        {course.courseCode}
+                                      </option>
+                                    ))}
+                                  </select>
+                                ) : (
+                                  <span className="font-semibold">
+                                    {period.courseShortName}
+                                  </span>
+                                )}
                               </span>
                               <span className="text-sm">
-                                {period.teacherName === "" ? (
-                                  <button onClick={() => {}}>say hello</button>
+                                {period.courseShortName !== "" ? (
+                                  // to ensure if teahcer is also alloted
+                                  period.teacherName !== "" ? (
+                                    <span>{period.teacherName}</span>
+                                  ) : (
+                                    <select
+                                      className="font-semibold px-1 h-full w-full bg-transparent outline-1 outline-dashed"
+                                      name="teacherName"
+                                    >
+                                      <option value="">Select Teacher</option>
+
+                                      {/* 
+                                        1 courses find karo uppar kya hai 
+                                        2 course specific teachers search karo kon kon hai!!!
+                                        3 then render karo kya kya possible hai
+                                      */}
+                                      {courses
+                                        .find((course) => {
+                                          if (course._id === period.courseId) {
+                                            return course.takenBy.map(
+                                              (teacher) => (
+                                                <option key={teacher.teacherId}>
+                                                  hello
+                                                </option>
+                                              )
+                                            );
+                                          }
+                                        })
+                                        .takenBy.map((teacher) => (
+                                          <option key={teacher.teacherId}>
+                                            {teacher.teacherName}
+                                          </option>
+                                        ))}
+                                    </select>
+                                  )
                                 ) : (
-                                  "hello2"
+                                  <span className="text-red-500 text-xs font-semibold italic">
+                                    * Select Subject First
+                                  </span>
                                 )}
                               </span>
                             </div>
@@ -278,7 +373,6 @@ function CreateNewTimeTableComponent({
                         ))}
                       </tr>
                     ))}
-                    <tr></tr>
                   </tbody>
                 </table>
               )}
