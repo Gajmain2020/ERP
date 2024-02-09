@@ -231,8 +231,28 @@ function CreateNewTimeTableComponent({
     }
 
     //if the teacher is selected then run this
-    if (event.target.name === "teacherName") {
-      console.log("hello bhai");
+    if (event.target.name === "teacher") {
+      const [teacherName, teacherId] = event.target.value.split("#");
+      setTimeTable((timeTable) =>
+        timeTable.map((row, rIndex) => {
+          if (rIndex === rowIndex) {
+            // Update the specific row
+            return row.map((cell, cIndex) => {
+              if (cIndex === columnIndex) {
+                //make change over here for updation
+                return {
+                  ...cell,
+                  teacherName,
+                  teacherId,
+                };
+              }
+              return cell;
+            });
+          }
+          return row;
+        })
+      );
+      return;
     }
   }
 
@@ -334,29 +354,23 @@ function CreateNewTimeTableComponent({
                                   ) : (
                                     <select
                                       className="font-semibold px-1 h-full w-full bg-transparent outline-1 outline-dashed"
-                                      name="teacherName"
+                                      name="teacher"
+                                      onChange={(e) =>
+                                        handleTimeTableChange(idx, index, e)
+                                      }
                                     >
                                       <option value="">Select Teacher</option>
-
-                                      {/* 
-                                        1 courses find karo uppar kya hai 
-                                        2 course specific teachers search karo kon kon hai!!!
-                                        3 then render karo kya kya possible hai
-                                      */}
                                       {courses
                                         .find((course) => {
                                           if (course._id === period.courseId) {
-                                            return course.takenBy.map(
-                                              (teacher) => (
-                                                <option key={teacher.teacherId}>
-                                                  hello
-                                                </option>
-                                              )
-                                            );
+                                            return course;
                                           }
                                         })
                                         .takenBy.map((teacher) => (
-                                          <option key={teacher.teacherId}>
+                                          <option
+                                            value={`${teacher.teacherName}#${teacher.teacherId}`}
+                                            key={teacher.teacherId}
+                                          >
                                             {teacher.teacherName}
                                           </option>
                                         ))}
