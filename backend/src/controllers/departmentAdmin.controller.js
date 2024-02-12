@@ -1,6 +1,9 @@
+import bcrypt from "bcrypt";
+
 import Courses from "../models/course.model.js";
 import Teachers from "../models/teacher.model.js";
 import TimeTableMaps from "../models/timeTableMap.model.js";
+import Students from "../models/student.model.js";
 import TimeTables from "../models/timeTable.model.js";
 
 const days = [
@@ -407,6 +410,111 @@ export const saveTiemeTable = async (req, res) => {
     return res
       .status(201)
       .json({ message: "Time table created successfully.", success: true });
+  } catch (error) {
+    logOutError(error);
+    return res.status(500).json({
+      message: "Something went wrong. Please try again.",
+      success: false,
+    });
+  }
+};
+
+export const addMultipleStudents = async (req, res) => {
+  try {
+    const { department } = req.query;
+    const students = await req.body;
+
+    const added = [];
+    const rejected = [];
+
+    for (let i = 0; i < students.length; i++) {
+      const { name, email, department, urn, crn, semester, section } =
+        students[i];
+
+      if (
+        name === "" ||
+        email === "" ||
+        department === "" ||
+        urn === "" ||
+        crn === "" ||
+        semester === "" ||
+        section === ""
+      ) {
+        rejected.push(students[i]);
+        continue;
+      }
+
+      const isStudentAlreadyExisting = await Students.findOne({
+        $or: [{ email }, { urn }],
+      });
+
+      if (isStudentAlreadyExisting) {
+        rejected.push(students[i]);
+        continue;
+      }
+      const hashPassword = await bcrypt.hash(email, 10);
+      await Students.create({
+        name,
+        department,
+        email,
+        crn: section + "-" + crn,
+        urn,
+        password: hashPassword,
+        semester,
+        section,
+      });
+      added.push(students[i]);
+    }
+    return res.status(201).json({
+      message: `Out of ${students.length} students ${added.length} student(s) were successfully added and ${rejected.length} were rejected.`,
+      success: true,
+      data: {
+        added,
+        rejected,
+      },
+    });
+  } catch (error) {
+    logOutError(error);
+    return res.status(500).json({
+      message: "Something went wrong. Please try again.",
+      success: false,
+    });
+  }
+};
+
+export const addSingleStudent = async (req, res) => {
+  try {
+    const { department } = req.query;
+    const { name, semester, section, crn, urn, email } = req.body;
+
+    const isStudentAlreadyExisting = await Students.findOne({
+      $or: [{ urn }, { email }],
+    });
+
+    if (isStudentAlreadyExisting) {
+      return res.status(409).json({
+        message: "Student with given credentials already exists.",
+        success: false,
+      });
+    }
+
+    const hashPassword = await bcrypt.hash(email, 8);
+
+    await Students.create({
+      semester,
+      section,
+      urn,
+      name,
+      email,
+      password: hashPassword,
+      crn: section + "-" + crn,
+      department,
+    });
+
+    return res.status(201).json({
+      message: "Student added successfully.",
+      success: true,
+    });
   } catch (error) {
     logOutError(error);
     return res.status(500).json({

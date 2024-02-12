@@ -6,7 +6,7 @@ const studentSchema = mongoose.Schema(
   {
     name: reqString,
     department: reqString,
-    email: reqString,
+    email: { ...reqString, lowercase: true },
     crn: String,
     urn: reqString,
     password: reqString,

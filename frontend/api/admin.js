@@ -190,3 +190,34 @@ export async function saveTimeTableAPI(
     return error.response.data;
   }
 }
+
+export async function addMultipleStudentsAPI(students, department) {
+  try {
+    const response = await axios({
+      headers,
+      url:
+        AdminUrl +
+        `/${department}/add-multiple-students?department=${department}`,
+      data: students,
+      method: "POST",
+    });
+    return response.data;
+  } catch (error) {
+    return error.response.data;
+  }
+}
+export async function addSingleStudentAPI(student, department) {
+  try {
+    const response = await axios({
+      headers,
+      url:
+        AdminUrl +
+        `/${department}/add-single-students?department=${department}`,
+      data: student,
+      method: "POST",
+    });
+    return response.data;
+  } catch (error) {
+    return error.response.data;
+  }
+}

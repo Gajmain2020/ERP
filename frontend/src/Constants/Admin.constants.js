@@ -16,6 +16,14 @@ const INTIAL_COURSE_DATA = {
   semester: "",
   courseType: "core",
 };
+const INTIAL_STUDENT_DATA = {
+  name: "",
+  section: "",
+  semester: "",
+  urn: "",
+  crn: "",
+  email: "",
+};
 
 const CoursesTableHeader = [
   "S. No.",
@@ -29,6 +37,7 @@ const CoursesTableHeader = [
 export {
   CoursesTableHeader,
   INTIAL_COURSE_DATA,
+  INTIAL_STUDENT_DATA,
   AdminHomepage,
   AdminTimeTable,
   Students,
