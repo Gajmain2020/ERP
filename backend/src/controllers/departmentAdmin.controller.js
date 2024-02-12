@@ -3,6 +3,15 @@ import Teachers from "../models/teacher.model.js";
 import TimeTableMaps from "../models/timeTableMap.model.js";
 import TimeTables from "../models/timeTable.model.js";
 
+const days = [
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+];
+
 function logOutError(error) {
   console.log("ERROR:::");
   console.log(error);
@@ -207,6 +216,7 @@ export const fetchAllCourses = async (req, res) => {
     });
   }
 };
+
 export const fetchAllCoursesBySemester = async (req, res) => {
   try {
     const { department, semester } = req.query;
@@ -331,6 +341,62 @@ export const searchTeacher = async (req, res) => {
       message: "Teachers sent successfully.",
       success: true,
     });
+  } catch (error) {
+    logOutError(error);
+    return res.status(500).json({
+      message: "Something went wrong. Please try again.",
+      success: false,
+    });
+  }
+};
+
+export const saveTiemeTable = async (req, res) => {
+  try {
+    const timeTable = req.body;
+    const { semester, section, department } = req.query;
+
+    const isTimeTableAlreadyCreated = await TimeTableMaps.findOne({
+      semester,
+      section,
+      department,
+    });
+    if (isTimeTableAlreadyCreated) {
+      return res.status(409).json({
+        message: "Time table already exists.",
+        success: false,
+      });
+    }
+
+    //* creating the data to be filled in the database
+    const dataToPutInDatabase = [];
+    for (let i = 0; i < days.length; i++) {
+      const temp = [];
+      for (let j = 0; j < timeTable[i].length; j++) {
+        if (
+          timeTable[i][j].courseId === "" ||
+          timeTable[i][j].courseShortName === "" ||
+          timeTable[i][j].teacherName === "" ||
+          timeTable[i][j].teacherId === ""
+        ) {
+          return res.status(409).json({
+            message: "Insfficiency of data.",
+            success: false,
+          });
+        }
+        temp.push({
+          period: j + 1,
+          courseId: timeTable[i][j].courseId,
+          courseShortName: timeTable[i][j].courseShortName,
+          teacher: {
+            teacherName: timeTable[i][j].teacherName,
+            teacherId: timeTable[i][j].teacherId,
+          },
+        });
+      }
+      dataToPutInDatabase.push({ [days[i]]: temp });
+    }
+
+    // get a datastructure to put the data
   } catch (error) {
     logOutError(error);
     return res.status(500).json({

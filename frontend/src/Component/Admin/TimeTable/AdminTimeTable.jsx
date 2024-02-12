@@ -149,6 +149,7 @@ export default function AdminTimeTable() {
           createNewTimeTable={createNewTimeTable}
           searchValue={searchValue}
           department={department}
+          setErrorMessage={setErrorMessage}
         />
       )}
 
@@ -170,6 +171,7 @@ function CreateNewTimeTableComponent({
   createNewTimeTable,
   searchValue,
   department,
+  setErrorMessage,
 }) {
   const [timeTable, setTimeTable] = useState([
     ...Array.from({ length: 5 }, () =>
@@ -188,12 +190,14 @@ function CreateNewTimeTableComponent({
     })),
   ]);
   const [courses, setCourses] = useState(null);
+  const [apiCalled, setApiCalled] = useState(false);
 
   useEffect(() => {
     fetchAllCoursesBySemesterAPI(searchValue.semester, department)
       .then((res) => {
         if (!res.success) {
           alert(res.message);
+          console.log(res);
           return;
         }
         setCourses(() => res.courses);
@@ -256,6 +260,43 @@ function CreateNewTimeTableComponent({
     }
   }
 
+  function handleResetClick() {
+    setTimeTable(() => [
+      ...Array.from({ length: 5 }, () =>
+        Array.from({ length: 7 }, () => ({
+          courseShortName: "",
+          courseId: "",
+          teacherName: "",
+          teacherId: "",
+        }))
+      ),
+      Array.from({ length: 5 }, () => ({
+        courseShortName: "",
+        courseId: "",
+        teacherName: "",
+        teacherId: "",
+      })),
+    ]);
+  }
+
+  function handleSaveClick() {
+    for (let i = 0; i < timeTable.length; i++) {
+      for (let j = 0; j < timeTable[i].length; j++) {
+        if (
+          timeTable[i][j].courseShortName === "" ||
+          timeTable[i][j].courseId === "" ||
+          timeTable[i][j].teacherName === "" ||
+          timeTable[i][j].teacherId === ""
+        ) {
+          setErrorMessage("Time table is not filled properly.");
+          return;
+        }
+      }
+    }
+    console.log(timeTable);
+    setApiCalled(() => true);
+  }
+
   return (
     <>
       {!createNewTimeTable && (
@@ -287,7 +328,13 @@ function CreateNewTimeTableComponent({
           <div className="hidden lg:flex md:flex">
             <div className="w-full">
               {!courses && <Loading />}
-              {courses && (
+              {courses && courses.length === 0 && (
+                <div>
+                  No courses available for the current semester please add
+                  courses and try again to create time table.
+                </div>
+              )}
+              {courses && courses.length > 0 && (
                 <table className="w-full border bg-gray-200/80 border-gray-400">
                   <thead className="rounded-md bg-gray-700/30">
                     <tr>
@@ -389,6 +436,25 @@ function CreateNewTimeTableComponent({
                     ))}
                   </tbody>
                 </table>
+              )}
+
+              {courses && courses.length > 0 && (
+                <div className="flex w-full gap-3 justify-center mt-2">
+                  <button
+                    onClick={handleResetClick}
+                    disabled={apiCalled}
+                    className="w-full outline outline-2 outline-red-500 text-gray-900 font-semibold bg-red-500/20 rounded-md py-1 hover:bg-red-500/60 hover:text-white transition disabled:cursor-not-allowed"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    disabled={apiCalled}
+                    onClick={handleSaveClick}
+                    className="w-full outline outline-2 outline-green-500 text-gray-900 font-semibold bg-green-500/40 rounded-md py-1 hover:bg-green-500/80 hover:text-white disabled:text-gray-300 disabled:cursor-not-allowed disabled:bg-gray-500/80 transition"
+                  >
+                    Save
+                  </button>
+                </div>
               )}
             </div>
           </div>

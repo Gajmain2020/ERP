@@ -5,7 +5,8 @@ const timeTableSchema = new mongoose.Schema(
     monday: [
       {
         period: Number,
-        subjectShortName: String,
+        courseShortName: String,
+        courseId: String,
         teacher: {
           teacherName: String,
           teacherId: String,
@@ -15,7 +16,8 @@ const timeTableSchema = new mongoose.Schema(
     tuesday: [
       {
         period: Number,
-        subjectShortName: String,
+        courseShortName: String,
+        courseId: String,
         teacher: {
           teacherName: String,
           teacherId: String,
@@ -25,7 +27,8 @@ const timeTableSchema = new mongoose.Schema(
     wednesday: [
       {
         period: Number,
-        subjectShortName: String,
+        courseShortName: String,
+        courseId: String,
         teacher: {
           teacherName: String,
           teacherId: String,
@@ -35,7 +38,8 @@ const timeTableSchema = new mongoose.Schema(
     thursday: [
       {
         period: Number,
-        subjectShortName: String,
+        courseShortName: String,
+        courseId: String,
         teacher: {
           teacherName: String,
           teacherId: String,
@@ -45,7 +49,8 @@ const timeTableSchema = new mongoose.Schema(
     friday: [
       {
         period: Number,
-        subjectShortName: String,
+        courseShortName: String,
+        courseId: String,
         teacher: {
           teacherName: String,
           teacherId: String,
@@ -55,7 +60,8 @@ const timeTableSchema = new mongoose.Schema(
     saturday: [
       {
         period: Number,
-        subjectShortName: String,
+        courseShortName: String,
+        courseId: String,
         teacher: {
           teacherName: String,
           teacherId: String,

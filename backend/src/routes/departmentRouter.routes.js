@@ -11,6 +11,7 @@ import {
   searchCourse,
   searchTeacher,
   fetchAllCoursesBySemester,
+  saveTiemeTable,
 } from "../controllers/departmentAdmin.controller.js";
 
 const router = Router();
@@ -28,5 +29,6 @@ router.route("/delete-course").delete(deleteCourse);
 router.route("/search-course").get(searchCourse);
 
 router.route("/search-time-table").get(searchTimeTable);
+router.route("/save-time-table").post(saveTiemeTable);
 
 export default router;

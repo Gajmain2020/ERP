@@ -169,3 +169,24 @@ export async function removeTeacherFromCourseAPI(teacher, course, department) {
     return error.response.data;
   }
 }
+
+export async function saveTimeTableAPI(
+  timeTable,
+  semester,
+  section,
+  department
+) {
+  try {
+    const response = await axios({
+      headers,
+      url:
+        AdminUrl +
+        `/${department}/save-time-table?semester=${semester}&section=${section}&department=${department}`,
+      method: "POST",
+      data: timeTable,
+    });
+    return response.data;
+  } catch (error) {
+    return error.response.data;
+  }
+}
