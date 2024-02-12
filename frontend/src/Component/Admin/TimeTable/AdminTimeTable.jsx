@@ -8,6 +8,7 @@ import Wrapper from "../../Common/Wrapper";
 import ErrSuccSnackbar from "../../Common/ErrSuccSnackbar";
 import {
   fetchAllCoursesBySemesterAPI,
+  saveTimeTableAPI,
   searchTimeTableAPI,
 } from "../../../../api/admin";
 import { useParams } from "react-router-dom";
@@ -150,6 +151,7 @@ export default function AdminTimeTable() {
           searchValue={searchValue}
           department={department}
           setErrorMessage={setErrorMessage}
+          setSuccessMessage={setSuccessMessage}
         />
       )}
 
@@ -172,6 +174,7 @@ function CreateNewTimeTableComponent({
   searchValue,
   department,
   setErrorMessage,
+  setSuccessMessage,
 }) {
   const [timeTable, setTimeTable] = useState([
     ...Array.from({ length: 5 }, () =>
@@ -293,8 +296,26 @@ function CreateNewTimeTableComponent({
         }
       }
     }
-    console.log(timeTable);
     setApiCalled(() => true);
+    saveTimeTableAPI(
+      timeTable,
+      searchValue.semester,
+      searchValue.section,
+      department
+    )
+      .then((res) => {
+        if (!res.success) {
+          setErrorMessage(() => res.message);
+          return;
+        }
+
+        setSuccessMessage(() => res.message);
+      })
+      .catch((err) => {
+        setErrorMessage(err.message);
+        return;
+      })
+      .finally(() => setApiCalled(() => false));
   }
 
   return (

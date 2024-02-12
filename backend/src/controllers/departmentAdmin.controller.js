@@ -367,10 +367,7 @@ export const saveTiemeTable = async (req, res) => {
       });
     }
 
-    //* creating the data to be filled in the database
-    const dataToPutInDatabase = [];
     for (let i = 0; i < days.length; i++) {
-      const temp = [];
       for (let j = 0; j < timeTable[i].length; j++) {
         if (
           timeTable[i][j].courseId === "" ||
@@ -383,20 +380,33 @@ export const saveTiemeTable = async (req, res) => {
             success: false,
           });
         }
-        temp.push({
-          period: j + 1,
-          courseId: timeTable[i][j].courseId,
+
+        const teacher = await Teachers.findById(timeTable[i][j].teacherId);
+
+        teacher.classesTaken.push({
           courseShortName: timeTable[i][j].courseShortName,
-          teacher: {
-            teacherName: timeTable[i][j].teacherName,
-            teacherId: timeTable[i][j].teacherId,
-          },
+          courseId: timeTable[i][j].courseId,
+          semester,
+          section,
+          period: j,
+          dayOfWeek: i,
         });
+        await teacher.save();
       }
-      dataToPutInDatabase.push({ [days[i]]: temp });
     }
 
-    // get a datastructure to put the data
+    const timeTableCreated = await TimeTables.create({ timeTable });
+
+    await TimeTableMaps.create({
+      semester,
+      section,
+      department,
+      timeTable: timeTableCreated._id,
+    });
+
+    return res
+      .status(201)
+      .json({ message: "Time table created successfully.", success: true });
   } catch (error) {
     logOutError(error);
     return res.status(500).json({

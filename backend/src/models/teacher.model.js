@@ -33,9 +33,11 @@ const teacherSchema = Schema(
       type: [
         {
           courseShortName: String,
+          courseId: String,
           semester: String,
           section: String,
           period: Number,
+          dayOfWeek: Number,
         },
       ],
       default: [],
