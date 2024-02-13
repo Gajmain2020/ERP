@@ -83,6 +83,7 @@ function AddStudentsBackdrop({
   const [student, setStudent] = useState(INTIAL_STUDENT_DATA);
 
   function handleMultipleStudentsAdd() {
+    //! to check if the csv sheet is correct or not
     if (
       !("name" in students[0]) ||
       !("semester" in students[0]) ||
