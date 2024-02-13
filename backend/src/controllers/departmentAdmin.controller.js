@@ -325,22 +325,38 @@ export const searchCourse = async (req, res) => {
 
 export const searchTeacher = async (req, res) => {
   try {
-    const { teacherName } = req.query;
+    const { teacherName, empId } = req.query;
+    console.log(teacherName);
 
-    const teachers = await Teachers.find({
-      name: { $regex: teacherName, $options: "i" },
-    });
+    let teachersByName = [];
+    if (teacherName !== "") {
+      teachersByName = await Teachers.find({
+        name: { $regex: teacherName, $options: "i" },
+      });
+    }
 
-    if (!teachers || teachers.length === 0) {
+    let teachersByEmpId = [];
+    if (empId !== "") {
+      teachersByEmpId = await Teachers.find({
+        empId: { $regex: empId, $options: "i" },
+      });
+    }
+
+    const uniqueTeachers = [
+      ...new Set(teachersByName),
+      ...new Set(teachersByEmpId),
+    ];
+
+    if (!uniqueTeachers || uniqueTeachers.length === 0) {
       return res.status(404).json({
         message: "No teachers found.",
-        teachers,
+        teachers: uniqueTeachers,
         success: false,
       });
     }
 
     return res.status(200).json({
-      teachers,
+      teachers: uniqueTeachers,
       message: "Teachers sent successfully.",
       success: true,
     });
@@ -524,71 +540,86 @@ export const addSingleStudent = async (req, res) => {
   }
 };
 
-export const addSingleTeacher = async(req,res)=>{
+export const addSingleTeacher = async (req, res) => {
   try {
-    //! work here api endpoint to add single teacher in the database
-    const {name,empId,email} = req.body;
-    const {department} = req.query
+    const { name, empId, email, phoneNumber } = req.body;
+    const { department } = req.query;
 
     const isTeacherAlreadyExisting = await Teachers.findOne({
-      $or:[{empId},{email}]
-    })
+      $or: [{ empId }, { email }],
+    });
 
-    if(isTeacherAlreadyExisting){
+    if (isTeacherAlreadyExisting) {
       return res.status(409).json({
-        message:'Given credentials already exists.',success:false
-      })
+        message: "Given credentials already exists.",
+        success: false,
+      });
     }
 
-    const hashPassword = await bcrypt.hash(email,6);
+    const hashPassword = await bcrypt.hash(email, 6);
 
     await Teachers.create({
-      name,empId,email,password:hashPassword,department
-    })
+      name,
+      empId,
+      email,
+      phoneNumber,
+      password: hashPassword,
+      department,
+    });
 
     return res.status(201).json({
-      message:'Teacher added successfully.',success:true
-    })
-
+      message: "Teacher added successfully.",
+      success: true,
+    });
   } catch (error) {
-      return res.status(500).json({
-        message:'Something went wrong. Please try again.',
-        success:false,
-      })    
+    logOutError(error);
+    return res.status(500).json({
+      message: "Something went wrong. Please try again.",
+      success: false,
+    });
   }
-}
+};
 
-export const addMultipleTeachers = async(req,res)=>{
+export const addMultipleTeachers = async (req, res) => {
   try {
-    const added = [],rejected = [];
+    const added = [],
+      rejected = [];
 
     const teachers = req.body;
-    const {department} = req.query;
+    const { department } = req.query;
 
-    for(let i=0;i<teachers.length;i++){
-      const {name, empId, email} = teachers[i];
+    for (let i = 0; i < teachers.length; i++) {
+      const { name, empId, email } = teachers[i];
       const isTeacherAlreadyExisting = await Teachers.findOne({
-        $or:[{email},{empId}]
-      })
+        $or: [{ email }, { empId }],
+      });
 
-      if(isTeacherAlreadyExisting){
-        rejected.push(teachers[i])
+      if (isTeacherAlreadyExisting) {
+        rejected.push(teachers[i]);
         continue;
       }
 
-      const hashPassword = await bcrypt.hash(email,6)
+      const hashPassword = await bcrypt.hash(email, 6);
 
       await Teachers.create({
-        ...teachers[i],password:hashPassword,department
-      })
+        ...teachers[i],
+        password: hashPassword,
+        department,
+      });
 
+      added.push(teachers[i]);
     }
 
-    //! work here api endpoint to add multiple teacher in the database
+    return res.status(201).json({
+      message: `Out of ${teachers.length} teachers ${added.length} have been added and ${rejected.length} have been rejected.`,
+      added,
+      rejected,
+      success: true,
+    });
   } catch (error) {
-      return res.status(500).json({
-        message:'Something went wrong. Please try again.',
-        success:false,
-      })    
+    return res.status(500).json({
+      message: "Something went wrong. Please try again.",
+      success: false,
+    });
   }
-}
+};

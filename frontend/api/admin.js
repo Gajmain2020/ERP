@@ -123,13 +123,13 @@ export async function searchCourseAPI(courseCode, department) {
   }
 }
 
-export async function searchTeacherAPI(teacherName, department) {
+export async function searchTeacherAPI(teacherName, department, empId = "") {
   try {
     const response = await axios({
       headers,
       url:
         AdminUrl +
-        `/${department}/search-teacher?teacherName=${teacherName}&department=${department}`,
+        `/${department}/search-teacher?teacherName=${teacherName}&department=${department}&empId=${empId}`,
       method: "GET",
     });
     return response.data;
@@ -214,6 +214,37 @@ export async function addSingleStudentAPI(student, department) {
         AdminUrl +
         `/${department}/add-single-students?department=${department}`,
       data: student,
+      method: "POST",
+    });
+    return response.data;
+  } catch (error) {
+    return error.response.data;
+  }
+}
+
+export async function addSingleTeacherAPI(teacher, department) {
+  try {
+    const response = await axios({
+      headers,
+      url:
+        AdminUrl + `/${department}/add-single-teacher?department=${department}`,
+      data: teacher,
+      method: "POST",
+    });
+    return response.data;
+  } catch (error) {
+    return error.response.data;
+  }
+}
+
+export async function addMultipleTeachersAPI(teachers, department) {
+  try {
+    const response = await axios({
+      headers,
+      url:
+        AdminUrl +
+        `/${department}/add-multiple-teachers?department=${department}`,
+      data: teachers,
       method: "POST",
     });
     return response.data;

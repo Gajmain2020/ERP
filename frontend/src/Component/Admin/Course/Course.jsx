@@ -608,7 +608,10 @@ function BackDropComponentToAddTeacherToCourse({
               </div>
             )}
             {teachers && teachers.length === 0 && (
-              <div>no teachers to display</div>
+              <div className="flex flex-col gap-0.5">
+                <span className="text-lg">Opps!!! </span>
+                <span>There is no teacher matching to searched name.</span>
+              </div>
             )}
             <div className="col-span-2">
               <div className="grid grid-cols-1 gap-2 lg:grid-cols-2 ">

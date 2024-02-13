@@ -118,8 +118,6 @@ function AddStudentsBackdrop({
   }
 
   function handleAddSingleStudent() {
-    console.log(student);
-
     if (
       student.name === "" ||
       student.email === "" ||
