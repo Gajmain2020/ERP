@@ -540,6 +540,16 @@ export const addSingleTeacher = async(req,res)=>{
       })
     }
 
+    const hashPassword = await bcrypt.hash(email,6);
+
+    await Teachers.create({
+      name,empId,email,password:hashPassword,department
+    })
+
+    return res.status(201).json({
+      message:'Teacher added successfully.',success:true
+    })
+
   } catch (error) {
       return res.status(500).json({
         message:'Something went wrong. Please try again.',
