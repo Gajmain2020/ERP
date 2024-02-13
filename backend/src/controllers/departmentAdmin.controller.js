@@ -527,6 +527,19 @@ export const addSingleStudent = async (req, res) => {
 export const addSingleTeacher = async(req,res)=>{
   try {
     //! work here api endpoint to add single teacher in the database
+    const {name,empId,email} = req.body;
+    const {department} = req.query
+
+    const isTeacherAlreadyExisting = await Teachers.findOne({
+      $or:[{empId},{name},{email}]
+    })
+
+    if(isTeacherAlreadyExisting){
+      return res.status(409).json({
+        message:'Given credentials already exists.',success:false
+      })
+    }
+
   } catch (error) {
       return res.status(500).json({
         message:'Something went wrong. Please try again.',
