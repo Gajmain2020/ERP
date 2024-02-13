@@ -14,6 +14,8 @@ import {
   saveTiemeTable,
   addMultipleStudents,
   addSingleStudent,
+  addMultipleTeachers,addSingleTeacher
+  
 } from "../controllers/departmentAdmin.controller.js";
 
 const router = Router();
@@ -23,7 +25,8 @@ router.route("/add-multiple-students").post(addMultipleStudents);
 router.route("/add-single-students").post(addSingleStudent);
 
 //! - Teachers related routes
-router.route("/").get(testApi);
+router.route('/add-single-teacher').post(addSingleTeacher)
+router.route('/add-multiple-teachers').post(addMultipleTeachers)
 router.route("/add-teacher-to-course").patch(addTeacherToCourse);
 router.route("/remove-teacher-from-course").patch(removeTeacherFromCourse);
 router.route("/search-teacher").get(searchTeacher);

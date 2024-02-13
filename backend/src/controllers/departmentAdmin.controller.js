@@ -523,3 +523,25 @@ export const addSingleStudent = async (req, res) => {
     });
   }
 };
+
+export const addSingleTeacher = async(req,res)=>{
+  try {
+    //! work here api endpoint to add single teacher in the database
+  } catch (error) {
+      return res.status(500).json({
+        message:'Something went wrong. Please try again.',
+        success:false,
+      })    
+  }
+}
+
+export const addMultipleTeachers = async(req,res)=>{
+  try {
+    //! work here api endpoint to add multiple teacher in the database
+  } catch (error) {
+      return res.status(500).json({
+        message:'Something went wrong. Please try again.',
+        success:false,
+      })    
+  }
+}
