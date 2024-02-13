@@ -531,7 +531,7 @@ export const addSingleTeacher = async(req,res)=>{
     const {department} = req.query
 
     const isTeacherAlreadyExisting = await Teachers.findOne({
-      $or:[{empId},{name},{email}]
+      $or:[{empId},{email}]
     })
 
     if(isTeacherAlreadyExisting){
@@ -560,6 +560,30 @@ export const addSingleTeacher = async(req,res)=>{
 
 export const addMultipleTeachers = async(req,res)=>{
   try {
+    const added = [],rejected = [];
+
+    const teachers = req.body;
+    const {department} = req.query;
+
+    for(let i=0;i<teachers.length;i++){
+      const {name, empId, email} = teachers[i];
+      const isTeacherAlreadyExisting = await Teachers.findOne({
+        $or:[{email},{empId}]
+      })
+
+      if(isTeacherAlreadyExisting){
+        rejected.push(teachers[i])
+        continue;
+      }
+
+      const hashPassword = await bcrypt.hash(email,6)
+
+      await Teachers.create({
+        ...teachers[i],password:hashPassword,department
+      })
+
+    }
+
     //! work here api endpoint to add multiple teacher in the database
   } catch (error) {
       return res.status(500).json({
