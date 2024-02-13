@@ -1,5 +1,11 @@
+import Heading from "../../Common/Heading";
 import Wrapper from "../../Common/Wrapper";
 
 export default function Teachers() {
-  return <Wrapper>this is teachers componet</Wrapper>;
+  return <Wrapper>
+    <Heading>Add Teacher(s)</Heading>
+
+
+
+  </Wrapper>;
 }
