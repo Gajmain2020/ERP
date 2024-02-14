@@ -327,28 +327,17 @@ export const searchCourse = async (req, res) => {
 export const searchTeacher = async (req, res) => {
   try {
     const { teacherName, empId } = req.query;
-    console.log(teacherName);
 
-    let teachersByName = [];
-    if (teacherName !== "") {
-      teachersByName = await Teachers.find({
-        name: { $regex: teacherName, $options: "i" },
-      });
-    }
+    const teachers = await Teachers.find({
+      $or: [
+        { name: { $regex: teacherName, $options: "i" } },
+        { empId: { $regex: empId, $options: "i" } },
+      ],
+    });
 
-    let teachersByEmpId = [];
-    if (empId !== "") {
-      teachersByEmpId = await Teachers.find({
-        empId: { $regex: empId, $options: "i" },
-      });
-    }
+    console.log(teachers);
 
-    const uniqueTeachers = [
-      ...new Set(teachersByName),
-      ...new Set(teachersByEmpId),
-    ];
-
-    if (!uniqueTeachers || uniqueTeachers.length === 0) {
+    if (!teachers || teachers.length === 0) {
       return res.status(404).json({
         message: "No teachers found.",
         teachers: uniqueTeachers,
@@ -357,7 +346,7 @@ export const searchTeacher = async (req, res) => {
     }
 
     return res.status(200).json({
-      teachers: uniqueTeachers,
+      teachers,
       message: "Teachers sent successfully.",
       success: true,
     });
@@ -671,7 +660,7 @@ export const removeTG = async (req, res) => {
 
     const TG = deletedTG.teacherName + "-" + deletedTG.teacherEmpId;
 
-    const updatedStudents = await Students.updateMany(
+    await Students.updateMany(
       { TG, department: department },
       { $set: { TG: "" } }
     );
