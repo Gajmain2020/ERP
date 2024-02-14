@@ -3,6 +3,9 @@ import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import Papa from "papaparse";
 
+import ControlPointTwoToneIcon from "@mui/icons-material/ControlPointTwoTone";
+import RemoveCircleTwoToneIcon from "@mui/icons-material/RemoveCircleTwoTone";
+
 import { QuickLinkStyles } from "../../../Constants/Admin.constants";
 
 import Heading from "../../Common/Heading";
@@ -12,6 +15,9 @@ import CloseIcon from "@mui/icons-material/Close";
 import {
   addMultipleTeachersAPI,
   addSingleTeacherAPI,
+  assignTGAPI,
+  removeTGAPI,
+  searchTeacherAPI,
 } from "../../../../api/admin";
 import ErrSuccSnackbar from "../../Common/ErrSuccSnackbar";
 import { INPUT_STYLE } from "../../../Constants/Students.constants";
@@ -363,7 +369,7 @@ function AssignTGBackdrop({
     empId: "",
     name: "",
   });
-  const [teachers, setTeachers] = useState([]);
+  const [teachers, setTeachers] = useState(null);
 
   function handleCancle() {
     setOpen(() => false);
@@ -371,10 +377,73 @@ function AssignTGBackdrop({
   }
 
   function handleSearch() {
-    if (searchValue.name === "" && searchValue.empId) {
+    if (searchValue.name === "" && searchValue.empId === "") {
       setErrorMessage("Atleast one search field is required.");
       return;
     }
+
+    setApiCalled(() => true);
+    searchTeacherAPI(searchValue.name, department, searchValue.empId)
+      .then((res) => {
+        if (!res.success) {
+          setErrorMessage(res.message);
+          return;
+        }
+        setTeachers(res.teachers);
+      })
+      .catch((err) => {
+        setErrorMessage(err.message);
+      })
+      .finally(() => setApiCalled(() => false));
+  }
+
+  function handleAssignTG(teacher) {
+    setApiCalled(() => true);
+    assignTGAPI(teacher, department)
+      .then((res) => {
+        if (!res.success) {
+          setErrorMessage(res.message);
+          return;
+        }
+
+        setSuccessMessage(res.message);
+
+        setTeachers((teachers) =>
+          teachers.map((tea) => {
+            if (tea._id === teacher._id) {
+              return { ...teacher, isTG: true };
+            }
+            return tea;
+          })
+        );
+      })
+      .catch((err) => setErrorMessage(err.message))
+      .finally(() => setApiCalled(() => false));
+  }
+  function handleRemoveTG(teacher) {
+    setApiCalled(() => true);
+
+    removeTGAPI(teacher, department)
+      .then((res) => {
+        if (!res.success) {
+          setErrorMessage(res.message);
+          return;
+        }
+        setSuccessMessage(res.message);
+
+        setTeachers((teachers) =>
+          teachers.map((tea) => {
+            if (tea._id === teacher._id) {
+              return { ...teacher, isTG: false };
+            }
+            return tea;
+          })
+        );
+      })
+      .catch((err) => {
+        setErrorMessage(err.message);
+      })
+      .finally(() => setApiCalled(() => false));
   }
 
   return (
@@ -442,8 +511,64 @@ function AssignTGBackdrop({
                 </button>
               </div>
             </div>
+            {teachers && teachers.length === 0 && (
+              <div className="flex flex-col gap-0.5">
+                <span className="text-lg">Opps!!! </span>
+                <span>There is no teacher matching to searched name.</span>
+              </div>
+            )}
+            <div className="col-span-2 mx-2">
+              <div className="grid grid-cols-1 gap-2 lg:grid-cols-2 ">
+                {teachers &&
+                  teachers.map((teacher) => (
+                    <div key={teacher._id}>
+                      <TeacherCard
+                        handleAssignTG={handleAssignTG}
+                        teacher={teacher}
+                        handleRemoveTG={handleRemoveTG}
+                      />
+                    </div>
+                  ))}
+              </div>
+            </div>
           </div>
         </div>
+      </div>
+    </div>
+  );
+}
+
+function TeacherCard({ teacher, handleAssignTG, handleRemoveTG }) {
+  return (
+    <div
+      onClick={() => {
+        if (!teacher.isTG) handleAssignTG(teacher);
+        else handleRemoveTG(teacher);
+      }}
+      className={
+        teacher.isTG
+          ? "border rounded-md px-2 py-2 border-dashed border-sky-200 bg-green-400/40 transition duration-200 cursor-pointer hover:bg-red-300/30"
+          : "border rounded-md px-2 py-2 border-dashed border-sky-200 hover:bg-green-400/50 transition duration-200 cursor-pointer hover:font-semibold"
+      }
+    >
+      <div className="flex justify-between items-center">
+        <span>
+          <span className="font-semibold">{teacher.name}</span>
+          <span className="flex text-sm gap-3">
+            <span>{teacher.empId}</span>
+            <span>{teacher.department}</span>
+            <span className="font-semibold">
+              {teacher.isTG ? "TG" : "Not TG"}
+            </span>
+          </span>
+        </span>
+        <span className="hover:text-lime-900/70 transition duration-150 hover:scale-125">
+          {!teacher.isTG ? (
+            <ControlPointTwoToneIcon />
+          ) : (
+            <RemoveCircleTwoToneIcon />
+          )}
+        </span>
       </div>
     </div>
   );

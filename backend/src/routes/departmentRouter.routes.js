@@ -16,6 +16,8 @@ import {
   addSingleStudent,
   addMultipleTeachers,
   addSingleTeacher,
+  assignTG,
+  removeTG,
 } from "../controllers/departmentAdmin.controller.js";
 
 const router = Router();
@@ -30,6 +32,8 @@ router.route("/add-multiple-teachers").post(addMultipleTeachers);
 router.route("/add-teacher-to-course").patch(addTeacherToCourse);
 router.route("/remove-teacher-from-course").patch(removeTeacherFromCourse);
 router.route("/search-teacher").get(searchTeacher);
+router.route("/assign-tg").patch(assignTG);
+router.route("/remove-tg").patch(removeTG);
 
 //! - Courses related routes
 router.route("/add-course").post(addCourse);

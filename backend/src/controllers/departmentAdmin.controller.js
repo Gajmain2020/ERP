@@ -5,6 +5,7 @@ import Teachers from "../models/teacher.model.js";
 import TimeTableMaps from "../models/timeTableMap.model.js";
 import Students from "../models/student.model.js";
 import TimeTables from "../models/timeTable.model.js";
+import TGs from "../models/teacherGuardian.model.js";
 
 const days = [
   "Monday",
@@ -619,6 +620,70 @@ export const addMultipleTeachers = async (req, res) => {
   } catch (error) {
     return res.status(500).json({
       message: "Something went wrong. Please try again.",
+      success: false,
+    });
+  }
+};
+
+export const assignTG = async (req, res) => {
+  try {
+    const { teacherId, department } = req.query;
+
+    const teacher = await Teachers.findById(teacherId);
+
+    if (!teacher) {
+      return res.status(404).json({
+        message: "Teacher not found.",
+        success: false,
+      });
+    }
+
+    teacher.isTG = true;
+    teacher.save();
+
+    await TGs.create({
+      teacherName: teacher.name,
+      teacherEmpId: teacher.empId,
+      teacherId: teacher._id,
+    });
+
+    return res.status(200).json({
+      message: "Successfully assigned as TG.",
+      success: true,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Something went wrong. Please try again.",
+      success: false,
+    });
+  }
+};
+
+export const removeTG = async (req, res) => {
+  try {
+    const { teacherId, department } = req.query;
+
+    const teacher = await Teachers.findByIdAndUpdate(teacherId, {
+      isTG: false,
+    });
+
+    const deletedTG = await TGs.findOneAndDelete({ teacherId: teacherId });
+
+    const TG = deletedTG.teacherName + "-" + deletedTG.teacherEmpId;
+
+    const updatedStudents = await Students.updateMany(
+      { TG, department: department },
+      { $set: { TG: "" } }
+    );
+
+    return res.status(200).json({
+      message: "TG removed successfully.",
+      success: true,
+    });
+  } catch (error) {
+    logOutError(error);
+    return res.status(500).json({
+      message: "Something went wrong. Please try again",
       success: false,
     });
   }

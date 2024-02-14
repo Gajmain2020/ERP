@@ -252,3 +252,35 @@ export async function addMultipleTeachersAPI(teachers, department) {
     return error.response.data;
   }
 }
+
+export async function assignTGAPI(teacher, department) {
+  try {
+    const response = await axios({
+      headers,
+      url:
+        AdminUrl +
+        `/${department}/assign-tg?department=${department}&teacherId=${teacher._id}`,
+      method: "PATCH",
+    });
+
+    return response.data;
+  } catch (error) {
+    return error.response.data;
+  }
+}
+
+export async function removeTGAPI(teacher, department) {
+  try {
+    const response = await axios({
+      headers,
+      url:
+        AdminUrl +
+        `/${department}/remove-tg?department=${department}&teacherId=${teacher._id}`,
+      method: "PATCH",
+    });
+
+    return response.data;
+  } catch (error) {
+    return error.response.data;
+  }
+}
