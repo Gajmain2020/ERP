@@ -284,3 +284,18 @@ export async function removeTGAPI(teacher, department) {
     return error.response.data;
   }
 }
+
+export async function fetchAllStudentsAPI(department, semester) {
+  try {
+    const response = await axios({
+      headers,
+      method: "GET",
+      url:
+        AdminUrl +
+        `/${department}/fetch-all-students?department=${department}&semester=${semester}`,
+    });
+    return response.data;
+  } catch (error) {
+    return error.response.data;
+  }
+}

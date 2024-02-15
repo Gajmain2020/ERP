@@ -44,6 +44,9 @@ import {
   Teachers,
 } from "./Constants/Admin.constants";
 import AllCourses from "./Component/Admin/Course/AllCourses";
+import AllStudents from "./Component/Admin/Students/AllStudents";
+import AllTeachers from "./Component/Admin/Teachers/AllTeachers";
+import AssignTG from "./Component/Admin/Students/AssignTG";
 
 const notLoggedInStyles =
   "flex justify-center mx-auto h-full min-h-screen  items-center";
@@ -215,14 +218,30 @@ function AdminRoutes(token, setToken) {
           path="time-table"
           element={<AdminTimeTable token={token} setToken={setToken} />}
         />
-        <Route
-          path="students"
-          element={<Students token={token} setToken={setToken} />}
-        />
-        <Route
-          path="teachers"
-          element={<Teachers token={token} setToken={setToken} />}
-        />
+        <Route path="students">
+          <Route
+            path=""
+            element={<Students token={token} setToken={setToken} />}
+          />
+          <Route
+            path="all-students"
+            element={<AllStudents token={token} setToken={setToken} />}
+          />
+          <Route
+            path="assign-teacher-guardian"
+            element={<AssignTG token={token} setToken={setToken} />}
+          />
+        </Route>
+        <Route path="teachers">
+          <Route
+            path=""
+            element={<Teachers token={token} setToken={setToken} />}
+          />
+          <Route
+            path="all-teachers"
+            element={<AllTeachers token={token} setToken={setToken} />}
+          />
+        </Route>
         <Route
           path="notice"
           element={<AdminNotice token={token} setToken={setToken} />}

@@ -12,7 +12,12 @@ const studentSchema = mongoose.Schema(
     password: reqString,
     semester: String,
     section: String,
-    TG: { type: String, default: "" },
+    TG: {
+      teacherName: String,
+      teacherId: String,
+      teacherPhoneNumber: String,
+      teacherEmpId: String,
+    },
 
     isDetailsFilled: { type: Boolean, default: false },
     isVerified: { type: Boolean, default: false },

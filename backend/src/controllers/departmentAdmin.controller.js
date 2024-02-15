@@ -335,8 +335,6 @@ export const searchTeacher = async (req, res) => {
       ],
     });
 
-    console.log(teachers);
-
     if (!teachers || teachers.length === 0) {
       return res.status(404).json({
         message: "No teachers found.",
@@ -634,6 +632,7 @@ export const assignTG = async (req, res) => {
       teacherName: teacher.name,
       teacherEmpId: teacher.empId,
       teacherId: teacher._id,
+      teacherPhoneNumber: teacher.phoneNumber,
     });
 
     return res.status(200).json({
@@ -671,6 +670,143 @@ export const removeTG = async (req, res) => {
     });
   } catch (error) {
     logOutError(error);
+    return res.status(500).json({
+      message: "Something went wrong. Please try again",
+      success: false,
+    });
+  }
+};
+
+export const fetchAllStudents = async (req, res) => {
+  try {
+    const { department, semester } = req.query;
+    const students = await Students.find({ department, semester }).select(
+      "-password"
+    );
+
+    if (students.length === 0) {
+      return res.status(404).json({
+        message: "No students to displayed.",
+        success: false,
+        students: [],
+      });
+    }
+
+    return res.status(200).json({
+      message: `${students.length} students sent successfully.`,
+      success: true,
+      students,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Something went wrong. Please try again",
+      success: false,
+    });
+  }
+};
+
+export const searchStudent = async (req, res) => {
+  try {
+    const { studentName } = req.query;
+
+    const students = await Students.find({
+      name: { $regex: studentName, $option: "i" },
+    }).select("-password");
+
+    if (!students || students.length === 0) {
+      return res.status(404).json({
+        message: "No students found.",
+        success: false,
+      });
+    }
+
+    return res.status(200).json({
+      message: `${students.length} students found and sent successfully`,
+      success: true,
+      students: [],
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Something went wrong. Please try again",
+      success: false,
+    });
+  }
+};
+
+export const assignTGToSingleStudent = async (req, res) => {
+  try {
+    const { teacherId, studentId } = req.query;
+
+    const TG = await TGs.findOne({
+      teacherId,
+    });
+    const student = await Students.findById(studentId).select(
+      "name urn _id semester section crn"
+    );
+
+    student.TG = {
+      teacherName: TG.teacherName,
+      teacherId: TG.teacherId,
+      teacherEmpId: TG.teacherEmpId,
+      teacherPhoneNumber: TG.teacherPhoneNumber,
+    };
+    await student.save();
+
+    TG.studentsUnderTG.push(student);
+
+    await TG.save();
+    return res.status(200).json({
+      message: "Student assigned a Teacher Guardian successfully.",
+      success: true,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Something went wrong. Please try again",
+      success: false,
+    });
+  }
+};
+
+export const assignTGToMultipleStudents = async (req, res) => {
+  try {
+    const students = req.body;
+    const { teacherId } = req.query;
+
+    const tg = await TGs.findOne({
+      teacherId,
+    });
+
+    const studentsToAdd = [];
+
+    for (let i = 0; i < students.length; i++) {
+      const student = await Students.findById(students[i]._id);
+
+      student.TG = {
+        teacherName: tg.teacherName,
+        teacherId: tg.teacherId,
+        teacherEmpId: tg.teacherEmpId,
+        teacherPhoneNumber: tg.teacherPhoneNumber,
+      };
+      await student.save();
+
+      studentsToAdd.push({
+        urn: student.urn,
+        id: student._id,
+        name: student.name,
+        semester: student.semester,
+        section: student.section,
+        crn: student.crn,
+      });
+    }
+
+    tg.studentsUnderTG = [...tg.studentsUnderTG, ...studentsToAdd];
+    await tg.save();
+
+    return res.status(200).json({
+      message: `Successfully assigned TG to ${students.length} students.`,
+      success: true,
+    });
+  } catch (error) {
     return res.status(500).json({
       message: "Something went wrong. Please try again",
       success: false,

@@ -18,11 +18,13 @@ import {
   addSingleTeacher,
   assignTG,
   removeTG,
+  fetchAllStudents,
 } from "../controllers/departmentAdmin.controller.js";
 
 const router = Router();
 
 //! - Students Related Routes
+router.route("/fetch-all-students").get(fetchAllStudents);
 router.route("/add-multiple-students").post(addMultipleStudents);
 router.route("/add-single-student").post(addSingleStudent);
 

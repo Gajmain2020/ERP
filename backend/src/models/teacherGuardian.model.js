@@ -18,6 +18,7 @@ const teacherGuardianSchema = new Schema(
         name: String,
         semester: String,
         section: String,
+        crn: String,
       },
     ],
   },

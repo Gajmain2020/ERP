@@ -43,6 +43,12 @@ export default function Students() {
         >
           View All Students
         </Link>
+        <Link
+          to="assign-teacher-guardian"
+          className={QuickLinkStyles + " flex justify-center"}
+        >
+          Assign TG
+        </Link>
       </div>
 
       {openAddStudents && (
