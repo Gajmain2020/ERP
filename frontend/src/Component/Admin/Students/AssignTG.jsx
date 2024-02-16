@@ -18,8 +18,6 @@ import ErrSuccSnackbar from "../../Common/ErrSuccSnackbar";
 
 export default function AssignTG() {
   const department = useLocation().pathname.split("/")[2];
-  const studentsPerPage = 20;
-  const [currentPage, setCurrentPage] = useState(0);
   const [searchValue, setSearchValue] = useState("");
   const [students, setStudents] = useState([]);
   const [errorMessage, setErrorMessage] = useState("");
@@ -60,7 +58,6 @@ export default function AssignTG() {
           setErrorMessage(res.message);
           setStudents(() => []);
           setShowStudents(() => []);
-          setCurrentPage(() => 0);
           return;
         }
         setStudents(res.students);
