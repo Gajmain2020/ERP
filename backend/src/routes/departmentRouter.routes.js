@@ -19,6 +19,9 @@ import {
   assignTG,
   removeTG,
   fetchAllStudents,
+  fetchTGs,
+  assignTGToSingleStudent,
+  assignTGToMultipleStudents,
 } from "../controllers/departmentAdmin.controller.js";
 
 const router = Router();
@@ -34,8 +37,11 @@ router.route("/add-multiple-teachers").post(addMultipleTeachers);
 router.route("/add-teacher-to-course").patch(addTeacherToCourse);
 router.route("/remove-teacher-from-course").patch(removeTeacherFromCourse);
 router.route("/search-teacher").get(searchTeacher);
+router.route("/fetch-teacher-guardians").get(fetchTGs);
 router.route("/assign-tg").patch(assignTG);
 router.route("/remove-tg").patch(removeTG);
+router.route("/assign-single-student-tg").patch(assignTGToSingleStudent);
+router.route("/assign-multiple-students-tg").patch(assignTGToMultipleStudents);
 
 //! - Courses related routes
 router.route("/add-course").post(addCourse);

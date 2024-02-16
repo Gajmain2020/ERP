@@ -67,9 +67,10 @@ export default function Homepage({ setToken }) {
           setErrorMessage(res.message);
           return;
         }
-        localStorage.setItem("authToken", JSON.stringify(res.data.authToken));
-        setToken(res.data.authToken);
-        navigate(`/student/${res.data.department}/${res.data.id}`);
+        console.log(res);
+        localStorage.setItem("authToken", JSON.stringify(res.authToken));
+        setToken(res.authToken);
+        navigate(`/student/${res.department}/${res.id}`);
       });
     }
   }

@@ -299,3 +299,57 @@ export async function fetchAllStudentsAPI(department, semester) {
     return error.response.data;
   }
 }
+
+export async function fetchTGAPI(department) {
+  try {
+    const response = await axios({
+      headers,
+      method: "GET",
+      url:
+        AdminUrl +
+        `/${department}/fetch-teacher-guardians?department=${department}`,
+    });
+    return response.data;
+  } catch (error) {
+    return error.response.data;
+  }
+}
+
+export async function assignSingleStudentTGAPI(
+  department,
+  teacherId,
+  studentId
+) {
+  try {
+    const response = await axios({
+      headers,
+      method: "PATCH",
+      url:
+        AdminUrl +
+        `/${department}/assign-single-student-tg?teacherId=${teacherId}&studentId=${studentId}`,
+    });
+    return response.data;
+  } catch (error) {
+    return error.response.data;
+  }
+}
+
+export async function assignMultipleStudentsTGAPI(
+  department,
+  teacherId,
+  students
+) {
+  try {
+    const response = await axios({
+      headers,
+      method: "PATCH",
+      data: students,
+      url:
+        AdminUrl +
+        `/${department}/assign-multiple-students-tg?teacherId=${teacherId}`,
+    });
+    return response.data;
+  } catch (error) {
+    return error.response.data;
+  }
+}

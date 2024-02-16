@@ -779,7 +779,7 @@ export const assignTGToMultipleStudents = async (req, res) => {
     const studentsToAdd = [];
 
     for (let i = 0; i < students.length; i++) {
-      const student = await Students.findById(students[i]._id);
+      const student = await Students.findById(students[i]);
 
       student.TG = {
         teacherName: tg.teacherName,
@@ -805,6 +805,29 @@ export const assignTGToMultipleStudents = async (req, res) => {
     return res.status(200).json({
       message: `Successfully assigned TG to ${students.length} students.`,
       success: true,
+    });
+  } catch (error) {
+    logOutError(error);
+    return res.status(500).json({
+      message: "Something went wrong. Please try again",
+      success: false,
+    });
+  }
+};
+
+export const fetchTGs = async (req, res) => {
+  try {
+    const { department } = req.query;
+
+    const tgs = await Teachers.find({
+      department,
+      isTG: true,
+    }).select("name _id");
+
+    return res.status(200).json({
+      message: `Successfully sent ${tgs.length} TGs.`,
+      success: true,
+      tgs,
     });
   } catch (error) {
     return res.status(500).json({

@@ -68,6 +68,10 @@ function App() {
       <div className={token === "" ? notLoggedInStyles : loggedInStyles}>
         {token !== "" && <Sidebar token={token} setToken={setToken} />}
         <Routes>
+          <Route
+            path="/"
+            element={<Homepage token={token} setToken={setToken} />}
+          />
           {BasicRoutes(token, setToken)}
           {TeacherRoutes(token, setToken)}
           {StudentRoutes(token, setToken)}
@@ -85,10 +89,6 @@ function App() {
 function BasicRoutes(token, setToken) {
   return (
     <>
-      <Route
-        path="/"
-        element={<Homepage token={token} setToken={setToken} />}
-      />
       <Route
         path="/admin-login"
         element={<AdminLogin token={token} setToken={setToken} />}
