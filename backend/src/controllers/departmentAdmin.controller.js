@@ -778,6 +778,7 @@ export const assignTGToSingleStudent = async (req, res) => {
     return res.status(200).json({
       message: "Student assigned a Teacher Guardian successfully.",
       success: true,
+      teacherName: TG.teacherName,
     });
   } catch (error) {
     logOutError(error);

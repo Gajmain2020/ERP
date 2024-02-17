@@ -22,7 +22,6 @@ export default function AssignTG() {
   const [students, setStudents] = useState([]);
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
-  const [showStudents, setShowStudents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [apiCalled, setApiCalled] = useState(false);
   const [semester, setSemester] = useState("");
@@ -57,11 +56,9 @@ export default function AssignTG() {
         if (!res.success) {
           setErrorMessage(res.message);
           setStudents(() => []);
-          setShowStudents(() => []);
           return;
         }
         setStudents(res.students);
-        setShowStudents(res.students);
       })
       .catch((err) => {
         setErrorMessage(err.message);
@@ -74,6 +71,7 @@ export default function AssignTG() {
 
   function handleSearchClick() {
     console.log(searchValue);
+    //! need to implement this feature in future
   }
 
   function handleSelectStudent(e, student) {
@@ -139,10 +137,10 @@ export default function AssignTG() {
         </div>
       )}
 
-      {semester !== "" && showStudents.length > 0 && (
+      {semester !== "" && students.length > 0 && (
         <StudentsTable
           selectedStudents={selectedStudents}
-          students={showStudents}
+          students={students}
           handleSelectStudent={handleSelectStudent}
           setStudent={setStudent}
           setOpenOption={setOpenOption}
@@ -328,6 +326,15 @@ function MultipleStudentTGBackdrop({
             setErrorMessage(res.message);
             return;
           }
+          setStudents((students) =>
+            students.map((stu) => {
+              if (stu._id === student) {
+                return { ...stu, TG: { teacherName: res.teacherName } };
+              }
+              return stu;
+            })
+          );
+
           setOpenOption(-1);
           setSuccessMessage(res.message);
           return;
@@ -371,9 +378,7 @@ function MultipleStudentTGBackdrop({
                 className={INPUT_STYLE}
                 onChange={(e) => setTeacher(e.target.value)}
               >
-                <option selected value="">
-                  Select TG
-                </option>
+                <option value="">Select TG</option>
                 {tgs.map((tg) => (
                   <option key={tg._id} value={tg._id}>
                     {tg.name}
