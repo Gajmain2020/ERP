@@ -14,7 +14,7 @@ const teacherGuardianSchema = new Schema(
     studentsUnderTG: [
       {
         urn: String,
-        id: String,
+        studentId: String,
         name: String,
         semester: String,
         section: String,

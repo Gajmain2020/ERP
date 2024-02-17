@@ -741,8 +741,21 @@ export const assignTGToSingleStudent = async (req, res) => {
       teacherId,
     });
     const student = await Students.findById(studentId).select(
-      "name urn _id semester section crn"
+      "name urn _id semester section crn TG"
     );
+
+    if (JSON.stringify(student.TG) !== "{}") {
+      const teacherId = student.TG.teacherId;
+      const tg = await TGs.findOne({
+        teacherId,
+      });
+
+      tg.studentsUnderTG = tg.studentsUnderTG.filter(
+        (stu) => stu.urn !== student.urn
+      );
+      console.log(tg.studentsUnderTG);
+      await tg.save();
+    }
 
     student.TG = {
       teacherName: TG.teacherName,
@@ -752,7 +765,14 @@ export const assignTGToSingleStudent = async (req, res) => {
     };
     await student.save();
 
-    TG.studentsUnderTG.push(student);
+    TG.studentsUnderTG.push({
+      urn: student.urn,
+      studentId: student._id,
+      name: student.name,
+      semester: student.semester,
+      section: student.section,
+      crn: student.crn,
+    });
 
     await TG.save();
     return res.status(200).json({
@@ -760,6 +780,7 @@ export const assignTGToSingleStudent = async (req, res) => {
       success: true,
     });
   } catch (error) {
+    logOutError(error);
     return res.status(500).json({
       message: "Something went wrong. Please try again",
       success: false,
@@ -780,7 +801,17 @@ export const assignTGToMultipleStudents = async (req, res) => {
 
     for (let i = 0; i < students.length; i++) {
       const student = await Students.findById(students[i]);
+      if (JSON.stringify(student.TG) !== "{}") {
+        const teacherId = student.TG.teacherId;
+        const tg = await TGs.findOne({
+          teacherId,
+        });
 
+        tg.studentsUnderTG = tg.studentsUnderTG.filter(
+          (stu) => stu.urn !== student.urn
+        );
+        await tg.save();
+      }
       student.TG = {
         teacherName: tg.teacherName,
         teacherId: tg.teacherId,

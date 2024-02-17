@@ -179,7 +179,16 @@ export default function AssignTG() {
   );
 }
 
-const studentHeader = ["Select", "CRN", "Name", "URN", "Email", "Sec", "TG"];
+const studentHeader = [
+  "Select",
+  "CRN",
+  "Name",
+  "URN",
+  "Email",
+  "Sec",
+  "TG",
+  "Operation",
+];
 
 function StudentsTable({
   students,
@@ -194,22 +203,21 @@ function StudentsTable({
         <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700/80 dark:text-gray-200">
           {selectedStudents.length > 0 ? (
             <tr className="border-b">
-              <th colSpan={5} scope="col" className="px-6  whitespace-nowrap ">
+              <th colSpan={7} scope="col" className="px-6  whitespace-nowrap ">
                 {selectedStudents.length} students have been selected.
               </th>
-              <th
-                colSpan={2}
-                scope="col"
-                className="px-6 py-4 whitespace-nowrap "
-              >
-                <button className="border" onClick={() => setOpenOption(0)}>
+              <th scope="col" className="px-4 py-4 whitespace-nowrap ">
+                <button
+                  className="px-4 py-1 border-2 border-sky-300 rounded-md bg-sky-600/60 hover:bg-sky-600/90 transition"
+                  onClick={() => setOpenOption(0)}
+                >
                   Add TG
                 </button>
               </th>
             </tr>
           ) : (
             <tr className="border-b">
-              <th colSpan={7} className="px-4 py-6">
+              <th colSpan={8} className="px-4 py-5">
                 No Students Selected
               </th>
             </tr>
@@ -249,17 +257,28 @@ function StudentsTable({
               <td className="px-6 py-2">{student.email}</td>
               <td className="px-6 py-2">{student.section}</td>
               <td className="px-6 py-2">
+                {student.TG ? student.TG.teacherName : "-"}
+              </td>
+              <td className="px-6 py-2">
                 {student.TG ? (
-                  <button className="border">change</button>
+                  <button
+                    className="px-2 py-1 border-2 border-slate-300 rounded-md bg-slate-600/60 hover:bg-sky-600/90 transition"
+                    onClick={() => {
+                      setOpenOption(1);
+                      setStudent(student._id);
+                    }}
+                  >
+                    Change
+                  </button>
                 ) : (
                   <button
                     onClick={() => {
                       setOpenOption(1);
                       setStudent(student._id);
                     }}
-                    className="border"
+                    className="px-3 py-1 border-2 border-slate-300 rounded-md bg-slate-600/60 hover:bg-sky-600/90 transition"
                   >
-                    add
+                    Assign
                   </button>
                 )}
               </td>
@@ -289,7 +308,6 @@ function MultipleStudentTGBackdrop({
 
   function handleAssignTG() {
     setApiCalled(true);
-    console.log("hello world");
     if (openOption === 0) {
       assignMultipleStudentsTGAPI(department, teacher, selectedStudents)
         .then((res) => {
