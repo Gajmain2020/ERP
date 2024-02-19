@@ -84,11 +84,16 @@ export default function Navbar({ token, setToken }) {
     }
   }, [token]);
 
+  console.log("student", data);
+
   return (
     <Disclosure as="nav" className="bg-gray-800/90 sticky top-0 z-10">
       {({ open }) => {
         //if student is logged in then show this
-        if (data !== null && userType === "student") {
+        if (
+          data !== null &&
+          (userType === "student" || userType === "Student")
+        ) {
           return (
             <>
               <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
@@ -251,7 +256,10 @@ export default function Navbar({ token, setToken }) {
         }
 
         // if teacher is logged in then show this
-        if (data !== null && userType === "teacher") {
+        if (
+          data !== null &&
+          (userType === "teacher" || userType === "Teacher")
+        ) {
           return (
             <>
               <div className="mx-auto max-w-[100vw] px-2 sm:px-6 lg:px-8">
@@ -412,7 +420,7 @@ export default function Navbar({ token, setToken }) {
             </>
           );
         }
-        if (data !== null && userType === "Admin") {
+        if (data !== null && (userType === "Admin" || userType === "admin")) {
           return (
             <>
               <div className="mx-auto max-w-[100vw] px-2 sm:px-6 lg:px-8">

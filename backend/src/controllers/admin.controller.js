@@ -89,8 +89,9 @@ export const loginAdmin = async (req, res) => {
       {
         name: isEmailExisting.name,
         email,
-        department: isEmailExisting.email,
-        userType: "Admin",
+        department: isEmailExisting.department,
+        userType: "admin",
+        id: isEmailExisting._id,
       },
       process.env.ACCESS_TOKEN_SECRET,
       { expiresIn: process.env.ACCESS_TOKEN_EXPIRY }
@@ -103,8 +104,6 @@ export const loginAdmin = async (req, res) => {
       department: isEmailExisting.department,
       id: isEmailExisting._id,
     });
-
-    console.log("This is admin login api end point");
   } catch (error) {
     logOutError(error);
     return res.status(500).json({
