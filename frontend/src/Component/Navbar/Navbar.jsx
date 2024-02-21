@@ -84,8 +84,6 @@ export default function Navbar({ token, setToken }) {
     }
   }, [token]);
 
-  console.log("student", data);
-
   return (
     <Disclosure as="nav" className="bg-gray-800/90 sticky top-0 z-10">
       {({ open }) => {

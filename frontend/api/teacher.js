@@ -26,11 +26,12 @@ export async function loginTeacher(data) {
     return error.response.data;
   }
 }
-export async function fetchStudentsByTG(data) {
+
+export async function fetchStudentsByTGAPI(teacherId) {
   try {
     const response = await axios({
       headers,
-      url: teacherUrl + `/fetch-student-tg/${data}`,
+      url: teacherUrl + `/fetch-student-tg?teacherId=${teacherId}`,
       method: "GET",
     });
     return response.data;

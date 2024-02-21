@@ -19,7 +19,7 @@ function TeacherHomepage({ token }) {
   //! useEffect for getting teacher data from the token
   useEffect(() => {
     if (token) {
-      setData(jwtDecode(token)._doc);
+      setData(jwtDecode(token));
     }
   }, [token]);
 
@@ -30,8 +30,6 @@ function TeacherHomepage({ token }) {
       clearInterval(timer);
     };
   }, []);
-
-  console.log(data);
 
   //# till teacher data is not decoded show skeleton and wait for data to be decoded
   if (data === null) {

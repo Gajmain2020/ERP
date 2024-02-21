@@ -172,6 +172,7 @@ export const addSingleStudentTG = async (req, res) => {
     });
   }
 };
+
 export const addMultipleStudentTG = async (req, res) => {
   try {
     const { teacherId } = req.query;
@@ -232,6 +233,33 @@ export const addMultipleStudentTG = async (req, res) => {
     return res.status(201).json({
       message: `Out of ${students.length} students ${assigned} have been successfully assingned to TG and ${notAssigned} have some conflict.`,
       success: true,
+    });
+  } catch (error) {
+    logOutError(error);
+    return res.status(500).json({
+      message: "Something went wrong. Please try again.",
+      success: false,
+    });
+  }
+};
+
+export const fetchStudentsByTG = async (req, res) => {
+  try {
+    const { teacherId } = req.query;
+
+    const tg = await TGs.findOne({
+      teacherId,
+    });
+    if (!tg) {
+      return res.status(404).json({
+        message: "TG not found.",
+        success: false,
+      });
+    }
+    return res.status(200).json({
+      message: `${tg.studentsUnderTG.length} students have been sent.`,
+      success: true,
+      students: tg.studentsUnderTG,
     });
   } catch (error) {
     logOutError(error);

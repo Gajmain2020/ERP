@@ -17,10 +17,11 @@ import {
 } from "../controllers/teacher.controller.js";
 import { uploadNotice } from "../middlewares/multerNotice.middleware.js";
 import { uploadAssignment } from "../middlewares/multerAssignment.middleware.js";
+import { fetchStudentsByTG } from "../controllers/teacherGuardian.controller.js";
 
 const router = Router();
 
-//basic routes
+//! basic routes
 router.route("/fetch-all-teachers").get(fetchAllTeachers);
 router.route("/fetch-teachers-by-department").get(fetchTeachersByDepartment);
 router.route("/register-single-teacher").post(registerSingleTeacher);
@@ -29,20 +30,24 @@ router.route("/login-teacher").post(loginTeacher);
 router.route("/delete-single-teacher").delete(deleteSingleTeacher);
 router.route("/delete-multiple-teachers").delete(deleteMultipleTeachers);
 
-// Notice Routes
+//! Notice Routes
 router.route("/add-notice").post(uploadNotice.single("notice"), addNewNotice);
 router.route("/delete-notice").delete(deleteNotice);
 
-//assignments Routes
+//! assignments Routes
 router
   .route("/add-assignment")
   .post(uploadAssignment.single("assignment"), addNewAssignment);
 router.route("/delete-assignment").delete(deleteAssignment);
 
-//students related routes
+//! students related routes
 router.route("/search-students").get(searchStudent);
 router
   .route("/get-all-students-by-semester-department")
   .get(getAllStudentsBySemester);
 router.route("/get-all-students-by-department").get(getAllStudentsByDepartment);
+
+//! teacher guardian routes
+router.route("/fetch-student-tg").get(fetchStudentsByTG);
+
 export default router;

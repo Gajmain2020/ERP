@@ -11,6 +11,7 @@ import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
 import RemoveRedEyeOutlinedIcon from "@mui/icons-material/RemoveRedEyeOutlined";
 import CloseIcon from "@mui/icons-material/Close";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
+import { fetchStudentsByTGAPI } from "../../../../api/teacher";
 
 const dummyStudents = [
   {
@@ -40,16 +41,34 @@ const dummyStudents = [
 ];
 
 function StudentValidation() {
-  const isTG = jwtDecode(localStorage.getItem("authToken"))._doc.isTG || false;
+  const isTG = jwtDecode(localStorage.getItem("authToken")).isTG || false;
+  const teacherId = jwtDecode(localStorage.getItem("authToken")).id || "";
 
   const [students, setStudents] = useState([]);
   const [rollNumber, setRollNumber] = useState("-1");
   const [apiCalled, setApiCalled] = useState(false);
   const [firstLoad, setFirstLoad] = useState(true);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
 
   useEffect(() => {
     if (students.length === 0) {
-      //make api call to get students details
+      setApiCalled(false);
+      fetchStudentsByTGAPI(teacherId)
+        .then((res) => {
+          if (!res.success) {
+            setErrorMessage(res.message);
+            return;
+          }
+          setSuccessMessage(res.message);
+          setStudents(res.students);
+        })
+        .catch((err) => {
+          setApiCalled(err.message);
+        })
+        .finally(() => {
+          setApiCalled(false);
+        });
     }
   }, [isTG]);
 
@@ -104,20 +123,21 @@ function StudentValidation() {
                       </tr>
                     </thead>
                     <tbody className="dark:text-zinc-200">
-                      {dummyStudents.map((student, idx) => (
-                        <TableRow
-                          key={idx}
-                          ind={idx}
-                          studentName={student.studentName}
-                          semester={student.semester}
-                          section={student.section}
-                          rollNumber={student.rollNumber}
-                          detailsFilled={student.detailsFilled}
-                          verified={student.verified}
-                          verifyStudent={verifyStudent}
-                          viewStudentDetails={viewStudentDetails}
-                        />
-                      ))}
+                      {students.length !== 0 &&
+                        students.map((student, idx) => (
+                          <TableRow
+                            key={idx}
+                            ind={idx}
+                            studentName={student.name}
+                            semester={student.semester}
+                            section={student.section}
+                            rollNumber={student.urn}
+                            detailsFilled={student.detailsFilled}
+                            verified={student.verified}
+                            verifyStudent={verifyStudent}
+                            viewStudentDetails={viewStudentDetails}
+                          />
+                        ))}
                     </tbody>
                   </table>
                 </div>
@@ -228,7 +248,7 @@ function BackdropComponent({ rollNumber, setRollNumber, verifyStudent }) {
 
   return (
     <div className="fixed top-0 left-0 w-[100%] h-[100vh] backdrop-blur bg-gray-900/50">
-      <div className="flex justify-center items-center h-[100%]">
+      <div className="flex mt-10 justify-center items-center h-[100%]">
         <div className="bg-gray-100/40 lg:h-5/6 md:h-2/3 xs:overflow-auto lg:w-2/3 md:w-2/3 sm:w-3/4 xs:w-5/6 xs:h-[90vh] sm:[80vh] rounded-md ">
           {/* CLOSE BUTTON */}
           <div className="flex items-between justify-end">
@@ -314,7 +334,7 @@ function BackdropComponent({ rollNumber, setRollNumber, verifyStudent }) {
           </div>
 
           {/* CLOSE AND VERIFY BUTTON */}
-          <div className="flex justify-around lg:my-10 md:my-10 sm:my-5 gap-10 mx-10 xs:my-5">
+          <div className="flex justify-around lg:my-10 md:my-10 sm:my-5 gap-5 mx-10 xs:my-5">
             <button
               onClick={() => verifyStudent(rollNumber)}
               className="border bg-green-700/70 hover:text-gray-100 hover:bg-green-700/90 transition px-8 flex-1 py-1 font-semibold rounded-md "

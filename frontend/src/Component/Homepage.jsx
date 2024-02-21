@@ -48,16 +48,21 @@ export default function Homepage({ setToken }) {
     setApiCalled(true);
     //if uer is teacher
     if (userType === "teacher") {
-      loginTeacher(data).then((res) => {
-        setApiCalled(false);
-        if (!res.success) {
-          setErrorMessage(res.message);
-          return;
-        }
-        localStorage.setItem("authToken", JSON.stringify(res.data.authToken));
-        setToken(res.data.authToken);
-        navigate(`/teacher/${res.data.department}/${res.data.id}`);
-      });
+      loginTeacher(data)
+        .then((res) => {
+          setApiCalled(false);
+          if (!res.success) {
+            setErrorMessage(res.message);
+            return;
+          }
+          console.log(res);
+          localStorage.setItem("authToken", JSON.stringify(res.authToken));
+          setToken(res.authToken);
+          navigate(`/teacher/${res.department}/${res.id}`);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     }
     //if user is student
     if (userType === "student") {
@@ -67,7 +72,6 @@ export default function Homepage({ setToken }) {
           setErrorMessage(res.message);
           return;
         }
-        console.log(res);
         localStorage.setItem("authToken", JSON.stringify(res.authToken));
         setToken(res.authToken);
         navigate(`/student/${res.department}/${res.id}`);

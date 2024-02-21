@@ -236,6 +236,20 @@ export const loginTeacher = async (req, res) => {
         success: false,
       });
     }
+    const token = jwt.sign(
+      {
+        name: teacherInDB.name,
+        department: teacherInDB.department,
+        email: teacherInDB.email,
+        empId: teacherInDB.empId,
+        phoneNumber: teacherInDB.phoneNumber,
+        id: teacherInDB._id,
+        isTG: teacherInDB.isTG,
+        userType: "teacher",
+      },
+      process.env.ACCESS_TOKEN_SECRET,
+      { expiresIn: process.env.ACCESS_TOKEN_EXPIRY }
+    );
 
     return res.status(200).json({
       success: true,
@@ -244,14 +258,7 @@ export const loginTeacher = async (req, res) => {
       id: teacherInDB._id,
       empId: teacherInDB.empId,
       department: teacherInDB.department,
-      authToken: jwt.sign(
-        {
-          ...teacherInDB,
-          userType: "teacher",
-        },
-        process.env.ACCESS_TOKEN_SECRET,
-        { expiresIn: process.env.ACCESS_TOKEN_EXPIRY }
-      ),
+      authToken: token,
     });
   } catch (error) {
     logOutError(error);

@@ -56,7 +56,6 @@ const loggedInStyles =
 
 function App() {
   const [token, setToken] = useState("");
-  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     document.title = "BIT-Buddy";
