@@ -56,7 +56,7 @@ export default function StudentHomepage({ token }) {
   //! useEffect for getting teacher data from the token
   useEffect(() => {
     if (token) {
-      setData(() => jwtDecode(token)._doc);
+      setData(() => jwtDecode(token));
     }
   }, [token]);
 
@@ -184,7 +184,7 @@ export default function StudentHomepage({ token }) {
             <span className=" font-semibold">Section:</span> {data.section}
           </div>
           <div className="flex gap-2 ">
-            <span className=" font-semibold">TG:</span> {data.TG.split("-")[0]}
+            <span className=" font-semibold">TG:</span> {data.TG.teacherName}
           </div>
           <div className="flex gap-2 ">
             <span className=" font-semibold">Verified:</span>{" "}
@@ -279,7 +279,7 @@ function BackdropComponent({
 
   return (
     <div className="fixed top-0 left-0 w-[100%] h-[100vh] backdrop-blur bg-gray-900/50">
-      <div className="flex  justify-center items-center h-[100%]">
+      <div className="flex mt-8 justify-center items-center h-[100%]">
         <div className="bg-gray-100/40 overflow-auto lg:h-[90vh] md:h-[90vh] lg:w-4/5 md:3/4 sm:w-3/4 xs:w-5/6 xs:h-[90vh] sm:[80vh] rounded-md ">
           {/* CLOSE BUTTON */}
           <div className="flex items-between justify-end">
@@ -356,7 +356,9 @@ function BackdropComponent({
                 placeholder="TG NAME"
                 required
                 disabled
-                value={student.TG !== "" ? student.TG : "TG not assigned"}
+                value={
+                  student.TG !== "" ? student.TG.teacherName : "TG not assigned"
+                }
                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg  block w-full p-2.5 dark:bg-gray-600 dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-300 cursor-not-allowed font-semibold"
               />
             </div>

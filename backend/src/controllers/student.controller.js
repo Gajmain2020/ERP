@@ -87,6 +87,25 @@ export const loginStudent = asyncHandler(async (req, res) => {
     });
   }
 
+  const token = jwt.sign(
+    {
+      name: student.name,
+      department: student.department,
+      urn: student.urn,
+      crn: student.crn,
+      email: student.email,
+      TG: student.TG,
+      id: student._id,
+      isDetailsFilled: student.isDetailsFilled,
+      isVerified: student.isVerified,
+      section: student.section,
+      semester: student.semester,
+      userType: "student",
+    },
+    process.env.ACCESS_TOKEN_SECRET,
+    { expiresIn: process.env.ACCESS_TOKEN_EXPIRY }
+  );
+
   return res.status(200).json({
     message: "Login successful.",
     success: true,
@@ -95,14 +114,7 @@ export const loginStudent = asyncHandler(async (req, res) => {
     department: student.department,
     isVerified: student?.isVerified || false,
     isDetailsFilled: student?.isDetailsFilled || false,
-    authToken: jwt.sign(
-      {
-        ...student,
-        userType: "student",
-      },
-      process.env.ACCESS_TOKEN_SECRET,
-      { expiresIn: process.env.ACCESS_TOKEN_EXPIRY }
-    ),
+    authToken: token,
   });
 });
 
