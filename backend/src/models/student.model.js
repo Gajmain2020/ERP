@@ -19,6 +19,20 @@ const studentSchema = mongoose.Schema(
       teacherEmpId: String,
     },
 
+    attendence: [
+      {
+        month: String,
+        classes: [
+          {
+            courseShortName: String,
+            date: String,
+            period: String,
+            status: String,
+          },
+        ],
+      },
+    ],
+
     isDetailsFilled: { type: Boolean, default: false },
     isVerified: { type: Boolean, default: false },
   },

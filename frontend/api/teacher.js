@@ -98,3 +98,33 @@ export async function fetchStudentBySectionAndSemester(
     return error.response.data;
   }
 }
+
+export async function fetchClassesAPI(teacherId, searchData) {
+  try {
+    const response = await axios({
+      headers,
+      url:
+        teacherUrl +
+        `/fetch-class?teacherId=${teacherId}&semester=${searchData.semester}&day=${searchData.day}&section=${searchData.section}&period=${searchData.period}`,
+      method: "GET",
+    });
+    return response.data;
+  } catch (error) {
+    return error.response.data;
+  }
+}
+
+export async function downloadAttendanceCSVAPI(teacherId, searchData) {
+  try {
+    const response = await axios({
+      headers,
+      url:
+        teacherUrl +
+        `/download-attendance-CSV?teacherId=${teacherId}&semester=${searchData.semester}&section=${searchData.section}&courseShortName=${searchData.courseShortName}`,
+      method: "GET",
+    });
+    return response.data;
+  } catch (error) {
+    return error.response.data;
+  }
+}

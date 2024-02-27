@@ -25,11 +25,11 @@ const teacherSidebarOption = [
   {
     title: "Divider",
   },
-  {
-    title: "Classes",
-    icon: <SchoolIcon />,
-    url: "classes",
-  },
+  // {
+  //   title: "Classes",
+  //   icon: <SchoolIcon />,
+  //   url: "classes",
+  // },
   {
     title: "Add Attendence",
     icon: <LocalLibraryIcon />,

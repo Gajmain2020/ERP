@@ -1,11 +1,12 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
+import { Link, useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
 
 import { useNavigate } from "react-router";
 import Heading from "../../Common/Heading";
 import Wrapper from "../../Common/Wrapper";
-import AnchorButton from "../../Common/AnchorButton";
-import { Link } from "react-router-dom";
+import { fetchClassesAPI } from "../../../../api/teacher";
 
 function Classes({ token, setToken }) {
   // make api call to get table content this is for only demonstration
@@ -29,6 +30,32 @@ function Classes({ token, setToken }) {
       numberOfStudents: "10",
     },
   ];
+  const teacherId = useParams().id;
+  const [classes, setClasses] = useState([]);
+  const [initialLoad, setInitialLoad] = useState(false);
+  const [apiCalled, setApiCalled] = useState(false);
+
+  const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+
+  useEffect(() => {
+    //!make api call to fetch all the classes for the specified teacher
+    fetchClassesAPI(teacherId)
+      .then((res) => {
+        console.log(res);
+        if (!res.success) {
+          setErrorMessage(res.message);
+          setClasses(res.classes);
+          return;
+        }
+        setClasses(res.classes);
+      })
+      .catch((err) => setErrorMessage(err.message))
+      .finally(() => {
+        setApiCalled(false);
+        setInitialLoad(true);
+      });
+  }, []);
 
   return (
     <Wrapper>

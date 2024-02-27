@@ -2,6 +2,7 @@ import fs from "fs";
 
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import csv from "csv-writer";
 
 import Teachers from "../models/teacher.model.js";
 import Notices from "../models/notice.model.js";
@@ -519,6 +520,142 @@ export const getAllStudentsByDepartment = async (req, res) => {
       students,
       success: true,
       numberOfStudents: students.length,
+    });
+  } catch (error) {
+    logOutError(error);
+    return res.status(500).json({
+      message: "Something went wrong. Please try again.",
+      success: false,
+    });
+  }
+};
+
+export const fetchClass = async (req, res) => {
+  try {
+    const { teacherId, semester, section, period, day } = req.query;
+
+    const teacher = await Teachers.findOne({
+      _id: teacherId,
+    }).select("classesTaken department");
+
+    if (!teacher) {
+      return res.status(404).json({
+        message: "Teacher not found.",
+      });
+    }
+
+    var cls;
+
+    for (let i = 0; i < teacher.classesTaken.length; i++) {
+      if (
+        teacher.classesTaken[i].semester === semester &&
+        teacher.classesTaken[i].section === section &&
+        teacher.classesTaken[i].period === parseInt(period) &&
+        teacher.classesTaken[i].dayOfWeek === parseInt(day)
+      ) {
+        cls = teacher.classesTaken[i];
+        break;
+      }
+    }
+
+    if (!cls) {
+      return res.status(404).json({
+        message: "You do not have class at particular day and time.",
+        success: false,
+      });
+    }
+
+    const students = await Students.find({
+      semester: cls.semester,
+      section: cls.section,
+      department: teacher.department,
+    }).select("urn name _id section email crn");
+
+    return res.status(200).json({
+      message: "Students of class sent successfully.",
+      success: true,
+      cls: cls,
+      students: students,
+    });
+  } catch (error) {
+    logOutError(error);
+    return res.status(500).json({
+      message: "Something went wrong. Please try again.",
+      success: false,
+    });
+  }
+};
+
+export const downloadAttendanceCSV = async (req, res) => {
+  try {
+    const { teacherId, semester, section, courseShortName } = req.query;
+
+    const teacher = await Teachers.findById(teacherId).select(
+      "classesTaken department"
+    );
+
+    var classExists = false;
+
+    for (let i = 0; i < teacher.classesTaken.length; i++) {
+      if (
+        teacher.classesTaken[i].semester === semester &&
+        teacher.classesTaken[i].section === section &&
+        teacher.classesTaken[i].courseShortName === courseShortName
+      ) {
+        classExists = true;
+        break;
+      }
+    }
+
+    //! if the class doesn't exist
+    if (!classExists) {
+      return res.status(404).json({
+        message:
+          "You have no assigned class in provided semester and section with the given course short name.",
+        success: false,
+      });
+    }
+
+    //! fetch the required students for csv data
+    const students = await Students.find({
+      department: teacher.department,
+      semester,
+      section,
+    }).select("urn crn name");
+
+    //! to manage date for next month
+    const currentDate = new Date();
+    const currentMonth = currentDate.getMonth();
+    const year = currentDate.getFullYear();
+    const dates = [];
+
+    for (let date = 1; date <= 31; date++) {
+      const newDate = new Date(year, currentMonth, date);
+      if (newDate.getMonth() !== currentMonth) break; // Check if it's still in the same month
+      if (newDate.getDay() !== 0)
+        dates.push(newDate.toISOString().slice(0, 10)); // Exclude Sundays
+    }
+
+    const csvWriter = csv.createObjectCsvWriter({
+      path: "attendance.csv",
+      header: [
+        { id: "crn", title: "CRN" },
+        { id: "name", title: "Name" },
+        { id: "urn", title: "URN" },
+        ...dates.map((date) => ({ id: date, title: date })),
+      ],
+    });
+    await csvWriter.writeRecords(students);
+    res.setHeader("Content-Disposition", "attachment; filename=file.ext");
+    res.setHeader("Content-Type", "application/octet-stream");
+    res.status(200).download("attendance.csv", (err) => {
+      if (err) {
+        console.error("Error sending file:", err);
+        res.status(500).send("Internal Server Error");
+      } else {
+        // Remove the file after download
+        fs.unlinkSync("attendance.csv");
+      }
     });
   } catch (error) {
     logOutError(error);
