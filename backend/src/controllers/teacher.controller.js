@@ -648,7 +648,7 @@ export const downloadAttendanceCSV = async (req, res) => {
     await csvWriter.writeRecords(students);
     res.setHeader("Content-Disposition", "attachment; filename=file.ext");
     res.setHeader("Content-Type", "application/octet-stream");
-    res.status(200).download("attendance.csv", (err) => {
+    res.status(200).download("attendance.hello", (err) => {
       if (err) {
         console.error("Error sending file:", err);
         res.status(500).send("Internal Server Error");

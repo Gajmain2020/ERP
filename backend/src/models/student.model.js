@@ -25,9 +25,7 @@ const studentSchema = mongoose.Schema(
         classes: [
           {
             courseShortName: String,
-            date: String,
-            period: String,
-            status: String,
+            status: [{ date: String, present: Boolean }],
           },
         ],
       },
