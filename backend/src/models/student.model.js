@@ -19,7 +19,7 @@ const studentSchema = mongoose.Schema(
       teacherEmpId: String,
     },
 
-    attendence: [
+    attendance: [
       {
         month: String,
         totalClass: Number,

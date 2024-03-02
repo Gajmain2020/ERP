@@ -131,16 +131,17 @@ export async function downloadAttendanceCSVAPI(teacherId, searchData) {
   }
 }
 
-export async function addAttendanceAPI(teacherId, students, searchData) {
+export async function addAttendanceAPI(teacherId, students, searchData, cls) {
   try {
     const response = await axios({
       headers,
       url:
         teacherUrl +
-        `/add-attendance?teacherId=${teacherId}&period=${searchData.period}&date=${searchData.date}`,
+        `/add-attendance?teacherId=${teacherId}&period=${searchData.period}&date=${searchData.date}&courseShortName=${cls}`,
       data: students,
       method: "PATCH",
     });
+
     return response.data;
   } catch (error) {
     return error.response.data;

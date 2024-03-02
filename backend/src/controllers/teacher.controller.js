@@ -2,12 +2,26 @@ import fs from "fs";
 
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import csv from "csv-writer";
 
 import Teachers from "../models/teacher.model.js";
 import Notices from "../models/notice.model.js";
 import Assignments from "../models/assignment.model.js";
 import Students from "../models/student.model.js";
+
+const Month_Options = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];
 
 function logOutError(error) {
   console.log("ERROR:::");
@@ -403,6 +417,7 @@ export const addNewAssignment = async (req, res) => {
 
 export const deleteAssignment = async (req, res) => {
   try {
+    //! need to work here buddy
   } catch (error) {
     logOutError(error);
     return res.status(500).json({
@@ -639,14 +654,147 @@ export const downloadAttendanceCSV = async (req, res) => {
 
 export const addAttendance = async (req, res) => {
   try {
-    const { teacherId, date, period } = req.query;
-
+    const { teacherId, date, period, courseShortName } = req.query;
     const students = req.body;
 
-    console.log("teacherID", teacherId);
-    console.log("date", date);
-    console.log("period", period);
-    console.log("students", students);
+    const teacher = await Teachers.findById(teacherId).select("name empId");
+
+    if (!teacher) {
+      return res.status(404).json({
+        message: "Teacher is invalid.",
+        success: false,
+      });
+    }
+
+    const month = Month_Options[parseInt(date.split("-")[1]) - 1];
+
+    for (let i = 0; i < students.length; i++) {
+      const student = await Students.findById(students[i].studentId);
+
+      if (
+        !student.attendance ||
+        student.attendance === null ||
+        student.attendance.length === 0
+      ) {
+        student.attendance = [
+          {
+            month,
+            totalClass: 1,
+            totalPresent: students[i].present ? 1 : 0,
+            totalAbsent: !students[i].present ? 1 : 0,
+            classes: [
+              {
+                courseShortName,
+                status: [
+                  {
+                    period,
+                    date: new Date(date),
+                    present: students[i].present,
+                    takenBy: teacher.name,
+                  },
+                ],
+              },
+            ],
+          },
+        ];
+        await student.save();
+        continue;
+      }
+
+      const attForMonth = student.attendance.find((att) => att.month === month);
+
+      if (!attForMonth) {
+        student.attendance.push({
+          month,
+          totalClass: 1,
+          totalPresent: students[i].present ? 1 : 0,
+          totalAbsent: !students[i].present ? 1 : 0,
+          classes: [
+            {
+              courseShortName,
+              status: [
+                {
+                  period,
+                  date: new Date(date),
+                  present: students[i].present,
+                  takenBy: teacher.name,
+                },
+              ],
+            },
+          ],
+        });
+        await student.save();
+        continue;
+      }
+
+      const attForCourse = attForMonth.classes.find(
+        (att) => att.courseShortName === courseShortName
+      );
+
+      if (attForMonth && !attForCourse) {
+        attForMonth.classes.push({
+          courseShortName,
+          status: [
+            {
+              period,
+              date: new Date(date),
+              present: students[i].present,
+              takenBy: teacher.name,
+            },
+          ],
+        });
+
+        student.attendance.map((att) => {
+          if (att.month === month) {
+            return {
+              ...attForMonth,
+              totalClass: attForMonth.totalClass + 1,
+              totalPresent:
+                attForMonth.totalPresent + students[i].present ? 1 : 0,
+              totalAbsent:
+                attForMonth.totalAbsent + !students[i].present ? 1 : 0,
+            };
+          }
+          return att;
+        });
+        continue;
+      }
+
+      if (attForMonth && attForCourse) {
+        attForCourse.status.push({
+          period,
+          date: new Date(date),
+          present: students[i].present,
+          takenBy: teacher.name,
+        });
+
+        attForMonth.classes.map((cls) => {
+          if (cls.courseShortName === courseShortName) {
+            return { ...cls, status: attForCourse };
+          }
+        });
+
+        student.attendance.map((att) => {
+          if (att.month === month) {
+            return {
+              ...attForMonth,
+              totalClass: attForMonth.totalClass + 1,
+              totalPresent:
+                attForMonth.totalPresent + students[i].present ? 1 : 0,
+              totalAbsent:
+                attForMonth.totalAbsent + !students[i].present ? 1 : 0,
+            };
+          }
+          return att;
+        });
+        await student.save();
+      }
+      break;
+    }
+    return res.status(200).json({
+      message: "Attendance uploaded successfully.",
+      success: true,
+    });
   } catch (error) {
     logOutError(error);
     return res.status(500).json({

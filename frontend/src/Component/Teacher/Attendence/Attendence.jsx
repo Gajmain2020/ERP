@@ -122,13 +122,15 @@ function Attendence() {
     });
 
     setApiCalled(true);
-    addAttendanceAPI(teacherId, allStudents, searchData)
+    addAttendanceAPI(teacherId, allStudents, searchData, cls.courseShortName)
       .then((res) => {
         if (!res.success) {
           setErrorMessage(res.message);
           return;
         }
-        console.log(res);
+
+        setSuccessMessage(res.message);
+        handleResetClick();
       })
       .catch((err) => setErrorMessage(err.message))
       .finally(() => setApiCalled(false));
