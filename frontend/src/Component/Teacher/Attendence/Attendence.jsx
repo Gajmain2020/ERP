@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import Heading from "../../Common/Heading";
 import Wrapper from "../../Common/Wrapper";
 import {
+  addAttendanceAPI,
   downloadAttendanceCSVAPI,
   fetchClassesAPI,
 } from "../../../../api/teacher";
@@ -31,12 +32,15 @@ function Attendence() {
   const [students, setStudents] = useState(null);
   const [cls, setCls] = useState(null);
 
+  const [presentStudents, setPresentStudents] = useState([]);
+
   const [searchData, setSearchData] = useState({
     courseShortName: "",
     semester: "",
     section: "",
     day: -1,
     period: -1,
+    date: "",
   });
 
   function handleChange(e) {
@@ -51,6 +55,7 @@ function Attendence() {
       setSearchData((searchData) => ({
         ...searchData,
         day: new Date(e.target.value).getDay(),
+        date: e.target.value,
       }));
       return;
     }
@@ -74,7 +79,6 @@ function Attendence() {
 
     fetchClassesAPI(teacherId, searchData)
       .then((res) => {
-        console.log(res);
         if (!res.success) {
           setErrorMessage(res.message);
           return;
@@ -98,12 +102,36 @@ function Attendence() {
     });
   }
 
-  function handlePresentStudent(studentId) {
-    console.log(studentId);
+  function handlePresentStudent(e, student) {
+    if (e.target.checked) {
+      setPresentStudents((students) => [...students, student._id]);
+      return;
+    }
+    setPresentStudents((students) =>
+      students.filter((stu) => stu.studentId !== student._id)
+    );
+    return;
   }
 
   function handleAddAttendance() {
-    console.log("add attendance");
+    const allStudents = students.map((stu) => {
+      if (presentStudents.includes(stu._id)) {
+        return { studentId: stu._id, present: true };
+      }
+      return { studentId: stu._id, present: false };
+    });
+
+    setApiCalled(true);
+    addAttendanceAPI(teacherId, allStudents, searchData)
+      .then((res) => {
+        if (!res.success) {
+          setErrorMessage(res.message);
+          return;
+        }
+        console.log(res);
+      })
+      .catch((err) => setErrorMessage(err.message))
+      .finally(() => setApiCalled(false));
   }
 
   function handleDownloadCSV() {
@@ -274,7 +302,6 @@ function Attendence() {
                     name="date"
                     id="date"
                     onChange={handleChange}
-                    value={searchData.day}
                     className={INPUT_STYLE}
                   />
                 </div>
@@ -430,9 +457,9 @@ function Attendence() {
                           </td>
                           <td className="px-4 py-2">
                             <input
-                              onChange={() => handlePresentStudent(student._id)}
+                              onChange={(e) => handlePresentStudent(e, student)}
                               type="checkbox"
-                              className="w-4 h-4 p-0 m-0"
+                              className="w-4 h-4 p-0 m-0 accent-green-500"
                             />
                           </td>
                         </tr>

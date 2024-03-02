@@ -125,15 +125,22 @@ export async function downloadAttendanceCSVAPI(teacherId, searchData) {
       method: "GET",
     });
 
-    // const blob = new Blob([response.data.students], { type: "text/csv" });
-    // const url = window.URL.createObjectURL(blob);
-    // const link = document.createElement("a");
-    // link.href = url;
-    // link.setAttribute("download", "data.csv");
-    // document.body.appendChild(link);
-    // link.click();
-    // link.parentNode.removeChild(link);
+    return response.data;
+  } catch (error) {
+    return error.response.data;
+  }
+}
 
+export async function addAttendanceAPI(teacherId, students, searchData) {
+  try {
+    const response = await axios({
+      headers,
+      url:
+        teacherUrl +
+        `/add-attendance?teacherId=${teacherId}&period=${searchData.period}&date=${searchData.date}`,
+      data: students,
+      method: "PATCH",
+    });
     return response.data;
   } catch (error) {
     return error.response.data;

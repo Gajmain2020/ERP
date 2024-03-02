@@ -22,10 +22,20 @@ const studentSchema = mongoose.Schema(
     attendence: [
       {
         month: String,
+        totalClass: Number,
+        totalPresent: Number,
+        totalAbsent: Number,
         classes: [
           {
             courseShortName: String,
-            status: [{ date: String, present: Boolean }],
+            status: [
+              {
+                period: Number,
+                date: String,
+                present: Boolean,
+                takenBy: String,
+              },
+            ],
           },
         ],
       },

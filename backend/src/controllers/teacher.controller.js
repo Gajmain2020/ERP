@@ -636,3 +636,22 @@ export const downloadAttendanceCSV = async (req, res) => {
     });
   }
 };
+
+export const addAttendance = async (req, res) => {
+  try {
+    const { teacherId, date, period } = req.query;
+
+    const students = req.body;
+
+    console.log("teacherID", teacherId);
+    console.log("date", date);
+    console.log("period", period);
+    console.log("students", students);
+  } catch (error) {
+    logOutError(error);
+    return res.status(500).json({
+      message: "Something went wrong. Please try again.",
+      success: false,
+    });
+  }
+};

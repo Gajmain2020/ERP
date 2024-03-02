@@ -16,6 +16,7 @@ import {
   getAllStudentsBySemester,
   fetchClass,
   downloadAttendanceCSV,
+  addAttendance,
 } from "../controllers/teacher.controller.js";
 import { uploadNotice } from "../middlewares/multerNotice.middleware.js";
 import { uploadAssignment } from "../middlewares/multerAssignment.middleware.js";
@@ -45,6 +46,7 @@ router.route("/delete-assignment").delete(deleteAssignment);
 //! teacher route
 router.route("/fetch-class").get(fetchClass);
 router.route("/download-attendance-CSV").get(downloadAttendanceCSV);
+router.route("/add-attendance").patch(addAttendance);
 
 //! students related routes
 router.route("/search-students").get(searchStudent);
