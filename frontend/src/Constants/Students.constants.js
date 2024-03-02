@@ -95,6 +95,18 @@ function CHECK_DETAILS(studentDetails) {
     return new ValidationResult(false, "Incorrect Aadhar Number.");
   }
 
+  if (
+    studentDetails.phoneNumber === studentDetails.fatherMobileNumber ||
+    studentDetails.phoneNumber === studentDetails.motherMobileNumber
+  ) {
+    return new ValidationResult(
+      false,
+      "Student Phone Number And Guardian Number Same."
+    );
+  }
+  if (studentDetails.motherMobileNumber === studentDetails.fatherMobileNumber) {
+    return new ValidationResult(false, "Father And Mother Phone Number Same.");
+  }
   return new ValidationResult(true);
 }
 

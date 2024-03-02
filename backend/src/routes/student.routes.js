@@ -13,6 +13,7 @@ import {
   deleteMultipleStudents,
   deleteSingleStudent,
 } from "../controllers/student.controller.js";
+import { uploadStudentProfilePhoto } from "../middlewares/multerUploadProfilePhotoStudent.middleware.js";
 
 const router = Router();
 
@@ -23,7 +24,9 @@ router.route("/fetch-all-students").get(fetchAllStudents);
 router.route("/login-student").post(loginStudent);
 router.route("/register-single-student").post(registerSingleStudent);
 router.route("/register-multiple-students").post(registerMultipleStudents);
-router.route("/save-details").post(saveStudentDetails);
+router
+  .route("/save-details")
+  .patch(uploadStudentProfilePhoto.single("profilePhoto"), saveStudentDetails);
 router.route("/edit-details").patch(editStudentDetails);
 router.route("/update-profile").patch(updateProfile);
 router.route("/delete-single-student").delete(deleteSingleStudent);

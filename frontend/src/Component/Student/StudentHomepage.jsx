@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import jwtDecode from "jwt-decode";
 
 import Heading from "../Common/Heading";
@@ -20,6 +20,7 @@ import {
   LABEL_STYLE,
   StateList,
 } from "../../Constants/Students.constants";
+import { saveStudentDetailsAPI } from "../../../api/student";
 
 const INITIAL_STUDENT_DETAILS = {
   admissionNumber: "",
@@ -41,12 +42,14 @@ const INITIAL_STUDENT_DETAILS = {
 
 // eslint-disable-next-line react/prop-types
 export default function StudentHomepage({ token }) {
+  const { id } = useParams();
   const navigate = useNavigate();
-  // const id = location.pathname.split("/")[3];
 
   const [date, setDate] = useState(new Date());
   const [data, setData] = useState(null);
   const [studentDetails, setStudentDetails] = useState(INITIAL_STUDENT_DETAILS);
+
+  const [apiCalled, setApiCalled] = useState(false);
 
   const [openDetailsBackdrop, setOpenDetailsBackdrop] = useState(false);
 
@@ -69,12 +72,29 @@ export default function StudentHomepage({ token }) {
   }, []);
 
   function handleSubmitStudentDetails() {
-    const check = CHECK_DETAILS(studentDetails);
-    if (!check.valid) {
-      setErrorMessage(check.message);
-    }
-    //make api call to store the data
-    console.log("make api call to store the data");
+    // const check = CHECK_DETAILS(studentDetails);
+    // if (!check.valid) {
+    //   setErrorMessage(check.message);
+    // }
+
+    const formdata = new FormData();
+
+    formdata.append("profilePhoto", studentDetails.profilePhoto);
+    delete studentDetails.profilePhoto;
+    formdata.append("details", studentDetails);
+
+    setApiCalled(true);
+    saveStudentDetailsAPI(formdata, id)
+      .then((res) => {
+        if (!res.success) {
+          setErrorMessage(res.message);
+          return;
+        }
+        setSuccessMessage(res.message);
+        setOpenDetailsBackdrop(false);
+      })
+      .catch((err) => setErrorMessage(err.message))
+      .finally(() => setApiCalled(false));
   }
 
   //# till student data is not decoded show skeleton and wait for data to be decoded

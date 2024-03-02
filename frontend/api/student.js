@@ -63,13 +63,16 @@ export async function loginStudent(data) {
   }
 }
 
-export async function saveStudentDetails(data) {
+export async function saveStudentDetailsAPI(studentDetails, studentId) {
   try {
     const response = await axios({
-      headers,
-      url: studentUrl + "/save-details",
+      headers: {
+        ...headers,
+        "Content-Type": "multipart/form-data",
+      },
+      url: studentUrl + `/save-details?studentId=${studentId}`,
       method: "PATCH",
-      data,
+      data: studentDetails,
     });
     return response.data;
   } catch (error) {

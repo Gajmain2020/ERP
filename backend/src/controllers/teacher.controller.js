@@ -367,7 +367,6 @@ export const addNewAssignment = async (req, res) => {
     const { assignmentName, subjectCode, subjectShortName, semester, section } =
       req.body;
     const { filename, destination } = req.file;
-    console.log("hello i am here");
 
     //check if notice is already existing or not
     const isAssignmentAlreadyProvided = await Assignments.findOne({

@@ -178,59 +178,47 @@ export const getStudentDetails = async (req, res) => {
 
 export const saveStudentDetails = async (req, res) => {
   try {
-    const query = req.query;
-    const {
-      dob,
-      bloodGroup,
-      admissionNumber,
-      gender,
-      studentMobileNumber,
-      motherName,
-      motherMobileNumber,
-      fatherName,
-      fatherMobileNumber,
-      aadharNumber,
-      category,
-      permanentAddress,
-      profilePhoto,
-    } = req.body;
+    const { studentId } = req.query;
+    const data = req.body;
+    const { filename, destination } = req.file;
 
-    const studentInDB = await Students.findById(query._id);
+    console.log(data);
+    console.log(filename, destination);
 
-    if (studentInDB.isDetailsFilled) {
-      return res.status(401).json({
-        message: "Student details already filled.",
-        success: false,
-      });
-    }
+    // if (studentInDB.isDetailsFilled) {
+    //   return res.status(401).json({
+    //     message: "Student details already filled.",
+    //     success: false,
+    //   });
+    // }
 
-    studentInDB.isDetailsFilled = true;
+    // studentInDB.isDetailsFilled = true;
 
-    console.log(studentInDB);
+    // console.log(studentInDB);
 
-    await StudentDetails.create({
-      studentId: studentInDB._id,
-      studentUrn: studentInDB.urn,
+    // await StudentDetails.create({
+    //   studentId: studentInDB._id,
+    //   studentUrn: studentInDB.urn,
 
-      dob: new Date(dob),
-      bloodGroup,
-      admissionNumber,
-      gender,
-      studentMobileNumber,
-      motherName,
-      motherMobileNumber,
-      fatherName,
-      fatherMobileNumber,
-      aadharNumber,
-      category,
-      permanentAddress,
-      profilePhoto,
-    });
-    await studentInDB.save();
-    return res.status(201).json({
-      message: "Student details uploaded successfully.",
-      success: true,
-    });
+    //   dob: new Date(dob),
+    //   bloodGroup,
+    //   admissionNumber,
+    //   gender,
+    //   studentMobileNumber,
+    //   motherName,
+    //   motherMobileNumber,
+    //   fatherName,
+    //   fatherMobileNumber,
+    //   aadharNumber,
+    //   category,
+    //   permanentAddress,
+    //   profilePhoto,
+    // });
+    // await studentInDB.save();
+    // return res.status(201).json({
+    //   message: "Student details uploaded successfully.",
+    //   success: true,
+    // });
   } catch (error) {
     logOutError(error);
     return res.status(500).json({
