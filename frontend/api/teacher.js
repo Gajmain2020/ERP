@@ -117,12 +117,23 @@ export async function fetchClassesAPI(teacherId, searchData) {
 export async function downloadAttendanceCSVAPI(teacherId, searchData) {
   try {
     const response = await axios({
+      // responseType: "blob",
       headers,
       url:
         teacherUrl +
         `/download-attendance-CSV?teacherId=${teacherId}&semester=${searchData.semester}&section=${searchData.section}&courseShortName=${searchData.courseShortName}`,
       method: "GET",
     });
+
+    // const blob = new Blob([response.data.students], { type: "text/csv" });
+    // const url = window.URL.createObjectURL(blob);
+    // const link = document.createElement("a");
+    // link.href = url;
+    // link.setAttribute("download", "data.csv");
+    // document.body.appendChild(link);
+    // link.click();
+    // link.parentNode.removeChild(link);
+
     return response.data;
   } catch (error) {
     return error.response.data;

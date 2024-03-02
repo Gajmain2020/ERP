@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import Heading from "../../Common/Heading";
 import Wrapper from "../../Common/Wrapper";
@@ -9,6 +9,7 @@ import {
 import { INPUT_STYLE } from "../../../Constants/Students.constants";
 import { Button } from "@mui/material";
 import ErrSuccSnackbar from "../../Common/ErrSuccSnackbar";
+import Papa from "papaparse";
 
 const Day_Options = [
   "Monday",
@@ -117,11 +118,22 @@ function Attendence() {
     setApiCalled(true);
     downloadAttendanceCSVAPI(teacherId, searchData)
       .then((res) => {
-        console.log(res);
         if (!res.success) {
           setErrorMessage(res.message);
           return;
         }
+
+        const students = res.students.map((student) => ({
+          Name: student.name,
+          CRN: student.crn,
+          URN: student.urn,
+        }));
+
+        const csvData = jsonToCsv(students);
+        downloadFile(
+          csvData,
+          `Attendance_${searchData.semester}_${searchData.section}.csv`
+        );
         setSuccessMessage("Downloading CSV file.");
         handleResetClick();
         return;
@@ -130,6 +142,41 @@ function Attendence() {
         setErrorMessage(err.message);
       })
       .finally(() => setApiCalled(false));
+  }
+
+  function jsonToCsv(jsonData) {
+    const dates = generateDates();
+
+    const csvData = Papa.unparse({
+      fields: ["Name", "CRN", "URN", ...dates],
+      data: jsonData,
+    });
+    return csvData;
+  }
+
+  const generateDates = () => {
+    const currentDate = new Date();
+    const lastDay = new Date(
+      currentDate.getFullYear(),
+      currentDate.getMonth() + 1,
+      0
+    ).getDate();
+    const datesArray = [];
+    for (let i = 1; i <= lastDay; i++) {
+      datesArray.push(
+        `${currentDate.getFullYear()}-${currentDate.getMonth() + 1}-${i}`
+      );
+    }
+    return datesArray;
+  };
+
+  function downloadFile(csvData, filename) {
+    const blob = new Blob([csvData], { type: "text/csv" });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = filename;
+    link.click();
   }
 
   function handleUploadCSV() {
@@ -159,6 +206,7 @@ function Attendence() {
                     name="courseShortName"
                     id="courseShortName"
                     placeholder="Course Short Name"
+                    value={searchData.courseShortName}
                     onChange={handleChange}
                   />
                 </div>
@@ -174,6 +222,7 @@ function Attendence() {
                     name="semester"
                     id="semester"
                     onChange={handleChange}
+                    value={searchData.semester}
                     className={INPUT_STYLE}
                   >
                     <option selected value="">
@@ -201,6 +250,7 @@ function Attendence() {
                     name="section"
                     id="section"
                     onChange={handleChange}
+                    value={searchData.section}
                     className={INPUT_STYLE}
                   >
                     <option selected value="">
@@ -224,6 +274,7 @@ function Attendence() {
                     name="date"
                     id="date"
                     onChange={handleChange}
+                    value={searchData.day}
                     className={INPUT_STYLE}
                   />
                 </div>
@@ -239,6 +290,7 @@ function Attendence() {
                     name="period"
                     id="period"
                     onChange={handleChange}
+                    value={searchData.period}
                     className={INPUT_STYLE}
                   >
                     <option selected value="">

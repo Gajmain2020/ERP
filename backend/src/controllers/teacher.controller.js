@@ -623,39 +623,10 @@ export const downloadAttendanceCSV = async (req, res) => {
       section,
     }).select("urn crn name");
 
-    //! to manage date for next month
-    const currentDate = new Date();
-    const currentMonth = currentDate.getMonth();
-    const year = currentDate.getFullYear();
-    const dates = [];
-
-    for (let date = 1; date <= 31; date++) {
-      const newDate = new Date(year, currentMonth, date);
-      if (newDate.getMonth() !== currentMonth) break; // Check if it's still in the same month
-      if (newDate.getDay() !== 0)
-        dates.push(newDate.toISOString().slice(0, 10)); // Exclude Sundays
-    }
-
-    const csvWriter = csv.createObjectCsvWriter({
-      path: "attendance.csv",
-      header: [
-        { id: "crn", title: "CRN" },
-        { id: "name", title: "Name" },
-        { id: "urn", title: "URN" },
-        ...dates.map((date) => ({ id: date, title: date })),
-      ],
-    });
-    await csvWriter.writeRecords(students);
-    res.setHeader("Content-Disposition", "attachment; filename=file.ext");
-    res.setHeader("Content-Type", "application/octet-stream");
-    res.status(200).download("attendance.hello", (err) => {
-      if (err) {
-        console.error("Error sending file:", err);
-        res.status(500).send("Internal Server Error");
-      } else {
-        // Remove the file after download
-        fs.unlinkSync("attendance.csv");
-      }
+    res.status(200).json({
+      students,
+      success: true,
+      message: "Sent successfully.",
     });
   } catch (error) {
     logOutError(error);
