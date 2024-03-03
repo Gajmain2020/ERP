@@ -19,7 +19,7 @@ const router = Router();
 
 //basic routes
 router.route("/get-student-basic-details").get(getStudentBasicDetails);
-router.route("/get-student-details").get(getStudentDetails);
+router.route("/fetch-student-details").get(getStudentDetails);
 router.route("/fetch-all-students").get(fetchAllStudents);
 router.route("/login-student").post(loginStudent);
 router.route("/register-single-student").post(registerSingleStudent);

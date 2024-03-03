@@ -79,3 +79,16 @@ export async function saveStudentDetailsAPI(studentDetails, studentId) {
     return error.response.data;
   }
 }
+
+export async function fetchStudentDetailsAPI(studentId) {
+  try {
+    const response = await axios({
+      headers,
+      method: "GET",
+      url: studentUrl + `/fetch-student-details?studentId=${studentId}`,
+    });
+    return response.data;
+  } catch (error) {
+    return error.response.data;
+  }
+}

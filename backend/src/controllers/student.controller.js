@@ -1,7 +1,10 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import path from "path";
+import imageToBase64 from "image-to-base64";
 
 import Students from "../models/student.model.js";
+import TGs from "../models/teacherGuardian.model.js";
 import StudentDetails from "../models/studentDetails.model.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
@@ -150,6 +153,12 @@ export const getStudentDetails = async (req, res) => {
   try {
     const query = req.query;
 
+    const studentInDB = await Students.findById(query.studentId).select(
+      "name urn email department crn section semester"
+    );
+
+    delete studentInDB._id;
+
     const studentDetails = await StudentDetails.findOne({
       studentId: query.studentId,
     });
@@ -160,12 +169,44 @@ export const getStudentDetails = async (req, res) => {
         success: false,
       });
     }
+
+    const dataToSend = {
+      permanentAddress: studentDetails.permanentAddress,
+      studentId: studentDetails.studentId,
+      studentUrn: studentDetails.studentUrn,
+      dob: studentDetails.dob,
+      bloodGroup: studentDetails.bloodGroup,
+      admissionNumber: studentDetails.admissionNumber,
+      gender: studentDetails.gender,
+      studentMobileNumber: studentDetails.studentMobileNumber,
+      motherName: studentDetails.motherName,
+      motherMobileNumber: studentDetails.motherMobileNumber,
+      fatherName: studentDetails.fatherName,
+      fatherMobileNumber: studentDetails.fatherMobileNumber,
+      aadharNumber: studentDetails.aadharNumber,
+      category: studentDetails.category,
+      name: studentInDB.name,
+      department: studentInDB.department,
+      semester: studentInDB.semester,
+      crn: studentInDB.crn,
+      section: studentInDB.section,
+      urn: studentInDB.urn,
+      email: studentInDB.email,
+    };
+
+    const imagesDirectory = path.dirname(
+      studentDetails.profilePhoto.destination + `/$student_profile_photo`
+    );
+
+    const image = await imageToBase64(
+      imagesDirectory + "/" + studentDetails.profilePhoto.fileName
+    );
+
     return res.status(200).json({
       message: "Student details sent successfully.",
       success: true,
-      data: {
-        details: studentDetails,
-      },
+      image,
+      details: dataToSend,
     });
   } catch (error) {
     logOutError(error);
@@ -237,6 +278,17 @@ export const saveStudentDetails = async (req, res) => {
       permanentAddress: { pinCode, state, address },
       profilePhoto: { fileName: filename, destination },
     });
+
+    if (studentInDB.TG) {
+      const tgInDB = await TGs.findOne({ teacherId: studentInDB.TG.teacherId });
+      tgInDB.studentsUnderTG = tgInDB.studentsUnderTG.map((stu) => {
+        if (stu.urn === studentInDB.urn) {
+          return { ...stu, isDetailsFilled: true };
+        }
+        return stu;
+      });
+      await tgInDB.save();
+    }
 
     const token = jwt.sign(
       {

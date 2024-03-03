@@ -13,33 +13,6 @@ import CloseIcon from "@mui/icons-material/Close";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import { fetchStudentsByTGAPI } from "../../../../api/teacher";
 
-const dummyStudents = [
-  {
-    studentName: "John",
-    rollNumber: 1,
-    semester: "VI",
-    section: "B",
-    detailsFilled: false,
-    verified: false,
-  },
-  {
-    studentName: "ron",
-    rollNumber: 2,
-    semester: "VI",
-    section: "B",
-    detailsFilled: true,
-    verified: false,
-  },
-  {
-    studentName: "harry",
-    rollNumber: 3,
-    semester: "VI",
-    section: "B",
-    detailsFilled: true,
-    verified: true,
-  },
-];
-
 function StudentValidation() {
   const isTG = jwtDecode(localStorage.getItem("authToken")).isTG || false;
   const teacherId = jwtDecode(localStorage.getItem("authToken")).id || "";
@@ -80,7 +53,7 @@ function StudentValidation() {
 
   function viewStudentDetails(rollNumber) {
     console.log("view single student details");
-    setRollNumber(() => rollNumber);
+    setRollNumber(rollNumber);
   }
 
   return (
@@ -132,7 +105,7 @@ function StudentValidation() {
                             semester={student.semester}
                             section={student.section}
                             rollNumber={student.urn}
-                            detailsFilled={student.detailsFilled}
+                            detailsFilled={student.isDetailsFilled}
                             verified={student.verified}
                             verifyStudent={verifyStudent}
                             viewStudentDetails={viewStudentDetails}

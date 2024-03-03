@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import jwtDecode from "jwt-decode";
+import { format } from "date-fns";
 
 import Heading from "../Common/Heading";
 import Wrapper from "../Common/Wrapper";
@@ -20,7 +21,10 @@ import {
   LABEL_STYLE,
   StateList,
 } from "../../Constants/Students.constants";
-import { saveStudentDetailsAPI } from "../../../api/student";
+import {
+  fetchStudentDetailsAPI,
+  saveStudentDetailsAPI,
+} from "../../../api/student";
 
 const INITIAL_STUDENT_DETAILS = {
   imageURL: "",
@@ -56,6 +60,8 @@ export default function StudentHomepage({ token, setToken }) {
 
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+
+  const [viewId, setViewId] = useState("");
 
   //! useEffect for getting teacher data from the token
   useEffect(() => {
@@ -222,7 +228,7 @@ export default function StudentHomepage({ token, setToken }) {
             <span className=" font-semibold">Details Filled:</span>{" "}
             {data.isDetailsFilled ? (
               <div
-                onClick={() => alert("create a data showing  component")}
+                onClick={() => setViewId(id)}
                 className="flex justify-center gap-2 items-center cursor-pointer"
               >
                 Filled
@@ -264,6 +270,13 @@ export default function StudentHomepage({ token, setToken }) {
           student={data}
           setErrorMessage={setErrorMessage}
           handleAddStudentDetails={handleSubmitStudentDetails}
+        />
+      )}
+      {viewId !== "" && (
+        <DetailsBackdropComponent
+          studentId={viewId}
+          setStudentId={setViewId}
+          setErrorMessage={setErrorMessage}
         />
       )}
       {(errorMessage !== "" || successMessage !== "") && (
@@ -681,6 +694,164 @@ function BackdropComponent({
             >
               Submit
             </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function DetailsBackdropComponent({
+  studentId,
+  setStudentId,
+  setErrorMessage,
+}) {
+  const [studentDetails, setStudentDetails] = useState(null);
+  const [image, setImage] = useState(null);
+
+  useEffect(() => {
+    console.log("i got triggered");
+    //make api call to fetch student details from server and get the details and store them to STUDNET DETAILS
+    if (studentId !== "") {
+      fetchStudentDetailsAPI(studentId)
+        .then((res) => {
+          if (!res.success) {
+            setErrorMessage(res.message);
+            return;
+          }
+
+          setStudentDetails(res.details);
+          setImage(res.image);
+        })
+        .catch((err) => setErrorMessage(err.message));
+    }
+  }, [studentId]);
+
+  function handleCloseBackdrop() {
+    setStudentId(() => "");
+  }
+
+  if (!studentDetails) {
+    return (
+      <div className="fixed top-0 left-0 w-[100%] h-[100vh] backdrop-blur bg-gray-900/50">
+        <div className="flex mt-10 justify-center items-center h-[100%]">
+          <div className="bg-gray-100/40 lg:h-5/6 md:h-2/3 xs:overflow-auto lg:w-2/3 md:w-2/3 sm:w-3/4 xs:w-5/6 xs:h-[90vh] sm:[80vh] rounded-md ">
+            {/* CLOSE BUTTON */}
+            <div className="flex items-between justify-end">
+              <button
+                onClick={handleCloseBackdrop}
+                className="mr-2 mt-2 flex items-between bg-gray-700/80 rounded-sm px-2 py-0.5"
+              >
+                <CloseIcon color="error" />
+              </button>
+            </div>
+
+            <div className="flex animate-pulse duration-100 font-semibold h-full justify-center items-center text-xl">
+              Loading
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="fixed top-0 left-0 w-[100%] h-[100vh] backdrop-blur bg-gray-900/50">
+      <div className="flex mt-10 justify-center items-center h-[100%]">
+        <div className="bg-gray-100/40 lg:h-5/6 md:h-2/3 xs:overflow-auto lg:w-2/3 md:w-2/3 sm:w-3/4 xs:w-5/6 xs:h-[90vh] sm:[80vh] rounded-md ">
+          {/* CLOSE BUTTON */}
+          <div className="flex items-between justify-end">
+            <button
+              onClick={handleCloseBackdrop}
+              className="mr-2 mt-2 flex items-between bg-gray-700/80 rounded-sm px-2 py-0.5"
+            >
+              <CloseIcon color="error" />
+            </button>
+          </div>
+
+          <Heading>Your Details</Heading>
+
+          {/* MAIN FORM FOR INPUT */}
+          <div className="flex px-5 flex-col mt-2">
+            <div className="flex flex-1 justify-center">
+              <img
+                src={"data:image/jpeg;base64," + image}
+                className="rounded-full object-cover h-36 w-36"
+                width={100}
+                alt="Profile Photo"
+              />
+            </div>
+            <div className="text-lg  px-2 mt-3 grid gap-2 lg:grid-cols-3 md:grid-cols-2 sm:grid-cols-1 xs:grid-cols-1">
+              <div className="truncate border-b-2 hover:bg-gray-200 rounded-md">
+                <strong>Name: </strong> {studentDetails.name}
+              </div>
+              <div className=" border-b-2 hover:bg-gray-200/20 rounded-md">
+                <strong>Email: </strong> {studentDetails.email}
+              </div>
+              <div className="truncate border-b-2 hover:bg-gray-200/20 rounded-md">
+                <strong>URN: </strong> {studentDetails.urn}
+              </div>
+              <div className="truncate border-b-2 hover:bg-gray-200/20 rounded-md">
+                <strong>CRN: </strong> {studentDetails.crn}
+              </div>
+              <div className="truncate border-b-2 hover:bg-gray-200/20 rounded-md">
+                <strong>Mobile: </strong> {studentDetails.studentMobieNumber}
+              </div>
+              <div className="truncate border-b-2 hover:bg-gray-200/20 rounded-md">
+                <strong>Department: </strong> {studentDetails.department}
+              </div>
+              <div className=" border-b-2 hover:bg-gray-200/20 rounded-md">
+                <strong>Admission No.: </strong>{" "}
+                {studentDetails.admissionNumber}
+              </div>
+              <div className="truncate  border-b-2 hover:bg-gray-200/20 rounded-md">
+                <strong>Sem / Sec: </strong> {studentDetails.semester}/
+                {studentDetails.section}
+              </div>
+              <div className="truncate border-b-2 hover:bg-gray-200/20 rounded-md">
+                <strong>DOB: </strong>{" "}
+                {format(new Date(studentDetails.dob), "MM/dd/yyyy")}
+              </div>
+              <div className="truncate border-b-2 hover:bg-gray-200/20 rounded-md">
+                <strong>Blood Group: </strong> {studentDetails.bloodGroup}
+              </div>
+              <div className="truncate border-b-2 hover:bg-gray-200/20 rounded-md">
+                <strong>Category: </strong> {studentDetails.category}
+              </div>
+              <div className="truncate border-b-2 hover:bg-gray-200/20 rounded-md">
+                <strong>Gender: </strong>{" "}
+                {studentDetails.gender === "male"
+                  ? "Male"
+                  : studentDetails.gender === "female"
+                  ? "Female"
+                  : "Other"}
+              </div>
+              <div className="truncate border-b-2 hover:bg-gray-200/20 rounded-md">
+                <strong>Aadhar: </strong> {studentDetails.aadharNumber}
+              </div>
+              <div className="truncate border-b-2 flex items-center hover:bg-gray-200/20 rounded-md">
+                <strong>F. Name: </strong> &nbsp;
+                <div className="flex flex-col overflow-auto no-scrollbar">
+                  <div>{studentDetails.fatherName}</div>
+                  <div className="text-sm my-0">
+                    +91 {studentDetails.fatherMobileNumber}
+                  </div>
+                </div>
+              </div>
+              <div className="truncate flex items-center border-b-2 hover:bg-gray-200/20 rounded-md">
+                <strong>M. Name: </strong> &nbsp;
+                <div className="flex flex-col">
+                  <div>{studentDetails.motherName}</div>
+                  <div className="text-sm my-0">
+                    +91 {studentDetails.motherMobileNumber}
+                  </div>
+                </div>
+              </div>
+              <div className="border-b-2 hover:bg-gray-200/20 rounded-md">
+                <strong>Address:</strong>{" "}
+                {`${studentDetails.permanentAddress.address},${studentDetails.permanentAddress.state}, ${studentDetails.permanentAddress.pinCode} `}
+              </div>
+            </div>
           </div>
         </div>
       </div>

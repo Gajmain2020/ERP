@@ -19,7 +19,7 @@ const teacherGuardianSchema = new Schema(
         semester: String,
         section: String,
         crn: String,
-        detailsFilled: { type: Boolean, default: false },
+        isDetailsFilled: { type: Boolean, default: false },
       },
     ],
   },
