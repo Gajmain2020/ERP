@@ -179,46 +179,89 @@ export const getStudentDetails = async (req, res) => {
 export const saveStudentDetails = async (req, res) => {
   try {
     const { studentId } = req.query;
-    const data = req.body;
     const { filename, destination } = req.file;
+    const {
+      dob,
+      bloodGroup,
+      admissionNumber,
+      gender,
+      mobileNumber,
+      motherName,
+      motherMobileNumber,
+      fatherName,
+      fatherMobileNumber,
+      aadharNumber,
+      category,
+      pinCode,
+      state,
+      address,
+    } = JSON.parse(req.body.details);
 
-    console.log(data);
-    console.log(filename, destination);
+    const studentInDB = await Students.findById(studentId).select(
+      "-password -attendance"
+    );
 
-    // if (studentInDB.isDetailsFilled) {
-    //   return res.status(401).json({
-    //     message: "Student details already filled.",
-    //     success: false,
-    //   });
-    // }
+    if (!studentInDB) {
+      return res.status(500).json({
+        message: "Student not found. Please try again.",
+        success: false,
+      });
+    }
 
-    // studentInDB.isDetailsFilled = true;
+    if (studentInDB.isDetailsFilled) {
+      return res.status(401).json({
+        message: "Student details already filled.",
+        success: false,
+      });
+    }
 
-    // console.log(studentInDB);
+    studentInDB.isDetailsFilled = true;
 
-    // await StudentDetails.create({
-    //   studentId: studentInDB._id,
-    //   studentUrn: studentInDB.urn,
+    await studentInDB.save();
 
-    //   dob: new Date(dob),
-    //   bloodGroup,
-    //   admissionNumber,
-    //   gender,
-    //   studentMobileNumber,
-    //   motherName,
-    //   motherMobileNumber,
-    //   fatherName,
-    //   fatherMobileNumber,
-    //   aadharNumber,
-    //   category,
-    //   permanentAddress,
-    //   profilePhoto,
-    // });
-    // await studentInDB.save();
-    // return res.status(201).json({
-    //   message: "Student details uploaded successfully.",
-    //   success: true,
-    // });
+    await StudentDetails.create({
+      studentId: studentInDB._id,
+      studentUrn: studentInDB.urn,
+
+      dob: new Date(dob),
+      bloodGroup,
+      admissionNumber,
+      gender,
+      studentMobileNumber: mobileNumber,
+      motherName,
+      motherMobileNumber,
+      fatherName,
+      fatherMobileNumber,
+      aadharNumber,
+      category,
+      permanentAddress: { pinCode, state, address },
+      profilePhoto: { fileName: filename, destination },
+    });
+
+    const token = jwt.sign(
+      {
+        name: studentInDB.name,
+        department: studentInDB.department,
+        urn: studentInDB.urn,
+        crn: studentInDB.crn,
+        email: studentInDB.email,
+        TG: studentInDB.TG,
+        id: studentInDB._id,
+        isDetailsFilled: true,
+        isVerified: studentInDB.isVerified,
+        section: studentInDB.section,
+        semester: studentInDB.semester,
+        userType: "student",
+      },
+      process.env.ACCESS_TOKEN_SECRET,
+      { expiresIn: process.env.ACCESS_TOKEN_EXPIRY }
+    );
+
+    return res.status(200).json({
+      message: "Student details uploaded successfully.",
+      success: true,
+      authToken: token,
+    });
   } catch (error) {
     logOutError(error);
     return res.status(500).json({

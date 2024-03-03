@@ -55,7 +55,6 @@ export default function Homepage({ setToken }) {
             setErrorMessage(res.message);
             return;
           }
-          console.log(res);
           localStorage.setItem("authToken", JSON.stringify(res.authToken));
           setToken(res.authToken);
           navigate(`/teacher/${res.department}/${res.id}`);

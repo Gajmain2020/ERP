@@ -16,7 +16,7 @@ const studentDetailsSchema = mongoose.Schema(
     admissionNumber: String,
     gender: {
       type: String,
-      enum: ["Male", "Female", "Other"],
+      enum: ["male", "female", "other"],
     },
     studentMobileNumber: String,
     motherName: String,
@@ -28,8 +28,11 @@ const studentDetailsSchema = mongoose.Schema(
       type: String,
       enum: ["Gen", "OBC", "ST", "SC"],
     },
-    permanentAddress: String,
-    profilePhoto: String,
+    permanentAddress: { address: String, state: String, pinCode: String },
+    profilePhoto: {
+      fileName: String,
+      destination: String,
+    },
   },
   {
     timestamps: true,

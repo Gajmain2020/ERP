@@ -23,6 +23,7 @@ import {
 import { saveStudentDetailsAPI } from "../../../api/student";
 
 const INITIAL_STUDENT_DETAILS = {
+  imageURL: "",
   admissionNumber: "",
   fatherName: "",
   motherName: "",
@@ -41,7 +42,7 @@ const INITIAL_STUDENT_DETAILS = {
 };
 
 // eslint-disable-next-line react/prop-types
-export default function StudentHomepage({ token }) {
+export default function StudentHomepage({ token, setToken }) {
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -72,16 +73,17 @@ export default function StudentHomepage({ token }) {
   }, []);
 
   function handleSubmitStudentDetails() {
-    // const check = CHECK_DETAILS(studentDetails);
-    // if (!check.valid) {
-    //   setErrorMessage(check.message);
-    // }
+    const check = CHECK_DETAILS(studentDetails);
+    if (!check.valid) {
+      setErrorMessage(check.message);
+    }
 
     const formdata = new FormData();
 
     formdata.append("profilePhoto", studentDetails.profilePhoto);
     delete studentDetails.profilePhoto;
-    formdata.append("details", studentDetails);
+    delete studentDetails.imageURL;
+    formdata.append("details", JSON.stringify(studentDetails));
 
     setApiCalled(true);
     saveStudentDetailsAPI(formdata, id)
@@ -90,8 +92,13 @@ export default function StudentHomepage({ token }) {
           setErrorMessage(res.message);
           return;
         }
+
         setSuccessMessage(res.message);
         setOpenDetailsBackdrop(false);
+        setStudentDetails(INITIAL_STUDENT_DETAILS);
+        localStorage.removeItem("authToken");
+        localStorage.setItem("authToken", JSON.stringify(res.authToken));
+        setToken(res.authToken);
       })
       .catch((err) => setErrorMessage(err.message))
       .finally(() => setApiCalled(false));
@@ -141,7 +148,7 @@ export default function StudentHomepage({ token }) {
       </div>
 
       {/* WARNING COMPONENT */}
-      {!data.detailsFilled && (
+      {!data.isDetailsFilled && (
         <div className="bg-red-300/30 rounded-md px-5 font-main flex items-center gap-2">
           <ErrorOutlineIcon />
           <span className="text-lg items-center">
@@ -213,7 +220,7 @@ export default function StudentHomepage({ token }) {
           <div></div>
           <div className="flex gap-2 ">
             <span className=" font-semibold">Details Filled:</span>{" "}
-            {data.detailsFilled ? (
+            {data.isDetailsFilled ? (
               <div
                 onClick={() => alert("create a data showing  component")}
                 className="flex justify-center gap-2 items-center cursor-pointer"
@@ -291,10 +298,19 @@ function BackdropComponent({
       setErrorMessage("Image size is more than 5MB.");
       return;
     }
-    setStudentDetails((student) => ({
-      ...student,
-      profilePhoto: e.target.files[0],
-    }));
+
+    const file = e.target.files[0];
+    const reader = new FileReader();
+
+    reader.onload = (event) => {
+      setStudentDetails((student) => ({
+        ...student,
+        profilePhoto: e.target.files[0],
+        imageURL: event.target.result,
+      }));
+    };
+
+    reader.readAsDataURL(file);
   }
 
   return (
@@ -495,7 +511,7 @@ function BackdropComponent({
                   <option selected value="">
                     Choose Category
                   </option>
-                  <option value="general">Gen.</option>
+                  <option value="Gen">Gen.</option>
                   <option value="OBC">OBC</option>
                   <option value="ST">ST</option>
                   <option value="SC">SC</option>
@@ -631,8 +647,8 @@ function BackdropComponent({
             <div className="flex w-full xs:flex-col aspect-square overflow-auto row-span-3 mt-2 px-2 items-center gap-2">
               <img
                 src={
-                  studentDetails.profilePhoto !== ""
-                    ? URL.createObjectURL(studentDetails.profilePhoto)
+                  studentDetails.imageURL !== ""
+                    ? studentDetails.imageURL
                     : UPLOAD_IMAGE
                 }
                 className="lg:w-[12vw] md:w-[12vw]  xs:w-[40vw] aspect-square rounded-full p-1"
