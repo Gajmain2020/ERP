@@ -17,6 +17,7 @@ export default function Attendance() {
 
   const [monthOptions, setMonthOptions] = useState([]);
   const [attendanceToShow, setAttendanceToShow] = useState([]);
+  const [month, setMonth] = useState("");
 
   useEffect(() => {
     //* make API call to fetch attendance of the student
@@ -27,7 +28,8 @@ export default function Attendance() {
             setErrorMessage(res.message);
             return;
           }
-          setAttendanceData(res.attendance);
+          setMonthOptions(res.attendance.map((d) => d.month));
+          setAttendanceData(() => res.attendance);
           formateData(res.attendance);
         })
         .catch((err) => {
@@ -36,9 +38,20 @@ export default function Attendance() {
     }
   }, []);
 
-  function formateData(data) {
-    setMonthOptions(data.map((d) => d.month));
+  useEffect(() => {
+    //! formate  data for students
+    if (month === "" && attendanceData) {
+      formateData(attendanceData);
+      console.log("month not selected");
+      return;
+    }
+    if (month !== "" && attendanceData) {
+      returnFormateData(attendanceData, month);
+      return;
+    }
+  }, [month]);
 
+  function formateData(data) {
     setAttendanceToShow(
       data
         .flatMap((month) =>
@@ -57,6 +70,27 @@ export default function Attendance() {
     );
   }
 
+  function returnFormateData(attendance, month) {
+    if (attendance) {
+      const newData = attendance
+        .flatMap((month) =>
+          month.classes.flatMap((course) =>
+            course.status.map((status) => ({
+              month: month.month,
+              courseShortName: course.courseShortName,
+              period: status.period,
+              date: status.date,
+              takenBy: status.takenBy,
+              present: status.present,
+            }))
+          )
+        )
+        .sort((a, b) => new Date(b.date) - new Date(a.date));
+
+      setAttendanceToShow(newData.filter((d) => d.month === month));
+    }
+  }
+
   //! dummy screen while useeffect is running
   if (!attendanceData) {
     return (
@@ -73,8 +107,6 @@ export default function Attendance() {
     console.log("Handle sheet download triggered");
   }
 
-  console.log(attendanceToShow);
-
   return (
     <Wrapper>
       <Heading>Attendance</Heading>
@@ -85,15 +117,13 @@ export default function Attendance() {
           <select
             placeholder="hello"
             name="filter"
-            id=""
             className={INPUT_STYLE}
+            onClick={(e) => setMonth(e.target.value)}
           >
             <option selected value="">
               Select Month
             </option>
-            <option selected value="">
-              All
-            </option>
+            <option value="">All</option>
 
             {monthOptions.map((month) => (
               <option key={month} value={month}>
