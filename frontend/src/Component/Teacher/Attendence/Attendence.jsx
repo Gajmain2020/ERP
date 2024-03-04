@@ -376,7 +376,7 @@ function Attendence() {
                 <span>Course Short Name:</span>&nbsp; {cls.courseShortName}
               </div>
               <div className="flex justify-center items-center">
-                <span>Day:</span>&nbsp; {Day_Options[cls.dayOfWeek]}
+                <span>Day:</span>&nbsp; {Day_Options[cls.dayOfWeek - 1]}
               </div>
               <div className="flex justify-center items-center">
                 <span>Sem/Sec:</span>&nbsp; {cls.semester}/{cls.section}

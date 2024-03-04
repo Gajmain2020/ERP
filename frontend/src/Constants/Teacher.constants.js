@@ -16,7 +16,16 @@ import Complaints from "../Component/Teacher/Complaints/Complaints";
 import NotFoundLoggedIn from "../Component/Common/NotFoundLoggedIn";
 import FindStudent from "../Component/Teacher/FindStudent/FindStudent";
 
+const AttendanceHeaderOption = [
+  "Date",
+  "Subject",
+  "Period",
+  "Faculty",
+  "Status",
+];
+
 export {
+  AttendanceHeaderOption,
   Navbar,
   Homepage,
   Notfound,

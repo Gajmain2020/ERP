@@ -654,6 +654,7 @@ export const downloadAttendanceCSV = async (req, res) => {
 export const addAttendance = async (req, res) => {
   try {
     const { teacherId, date, period, courseShortName } = req.query;
+
     const students = req.body;
 
     const teacher = await Teachers.findById(teacherId).select("name empId");
@@ -669,7 +670,6 @@ export const addAttendance = async (req, res) => {
 
     for (let i = 0; i < students.length; i++) {
       const student = await Students.findById(students[i].studentId);
-
       if (
         !student.attendance ||
         student.attendance === null ||
@@ -756,6 +756,8 @@ export const addAttendance = async (req, res) => {
           }
           return att;
         });
+        await student.save();
+
         continue;
       }
 
@@ -788,7 +790,6 @@ export const addAttendance = async (req, res) => {
         });
         await student.save();
       }
-      break;
     }
     return res.status(200).json({
       message: "Attendance uploaded successfully.",
