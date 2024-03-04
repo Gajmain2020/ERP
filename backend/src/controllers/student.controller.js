@@ -570,3 +570,36 @@ export const deleteMultipleStudents = async (req, res) => {
     });
   }
 };
+
+export const fetchStudentAttendance = async (req, res) => {
+  try {
+    const { studentId } = req.query;
+
+    const studentInDB = await Students.findById(studentId).select("attendance");
+
+    if (!studentInDB) {
+      return res.status(404).json({
+        message: "Student not found. Please try again.",
+        success: false,
+      });
+    }
+    if (studentInDB.attendance.length === 0) {
+      return res.status(404).json({
+        message: "No attendance record found for student.",
+        success: false,
+      });
+    }
+
+    return res.status(200).json({
+      message: "Student attendance sent successfully.",
+      success: true,
+      attendance: studentInDB.attendance,
+    });
+  } catch (error) {
+    logOutError(error);
+    return res.status(500).json({
+      message: "Something went wrong. Please try again.",
+      success: false,
+    });
+  }
+};

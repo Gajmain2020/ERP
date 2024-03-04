@@ -12,6 +12,7 @@ import {
   updateProfile,
   deleteMultipleStudents,
   deleteSingleStudent,
+  fetchStudentAttendance,
 } from "../controllers/student.controller.js";
 import { uploadStudentProfilePhoto } from "../middlewares/multerUploadProfilePhotoStudent.middleware.js";
 
@@ -31,5 +32,7 @@ router.route("/edit-details").patch(editStudentDetails);
 router.route("/update-profile").patch(updateProfile);
 router.route("/delete-single-student").delete(deleteSingleStudent);
 router.route("/delete-multiple-students").delete(deleteMultipleStudents);
+
+router.route("/fetch-student-attendance").get(fetchStudentAttendance);
 
 export default router;

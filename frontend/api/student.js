@@ -92,3 +92,16 @@ export async function fetchStudentDetailsAPI(studentId) {
     return error.response.data;
   }
 }
+
+export async function fetchStudentAttendanceAPI(studentId) {
+  try {
+    const response = await axios({
+      headers,
+      method: "GET",
+      url: studentUrl + `/fetch-student-attendance?studentId=${studentId}`,
+    });
+    return response.data;
+  } catch (error) {
+    return error.response.data;
+  }
+}
