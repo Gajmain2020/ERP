@@ -38,9 +38,6 @@ export default function TimeTable() {
   return (
     <Wrapper>
       <Heading>Time Table</Heading>
-      <div className="flex justify-center font-semibold text-lg items-center">
-        Time Table for semester and section
-      </div>
       <div>
         <table className="w-full border bg-gray-200/80 border-gray-400">
           <thead className="rounded-md bg-gray-700/30">
@@ -68,7 +65,7 @@ export default function TimeTable() {
                       className="border text-center border-gray-400"
                       key={index}
                     >
-                      <div className="grid gap-0.5 py-1 px-1 text-sm">
+                      <div className="grid py-0.5 px-0.5 text-sm">
                         <span className="font-semibold">
                           {period.courseShortName}
                         </span>

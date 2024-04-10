@@ -14,6 +14,7 @@ const assignmentSchema = new mongoose.Schema(
     section: reqString,
     fileName: reqString,
     filePath: reqString,
+    open: { type: Boolean, default: true },
     submittedBy: [
       {
         studentId: String,
