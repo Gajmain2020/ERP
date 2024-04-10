@@ -105,3 +105,18 @@ export async function fetchStudentAttendanceAPI(studentId) {
     return error.response.data;
   }
 }
+
+export async function getTimeTableAPI(semester, section, department) {
+  try {
+    const response = await axios({
+      headers,
+      url:
+        studentUrl +
+        `/get-time-table?semester=${semester}&section=${section}&department=${department}`,
+      method: "GET",
+    });
+    return response.data;
+  } catch (error) {
+    return error.response.data;
+  }
+}

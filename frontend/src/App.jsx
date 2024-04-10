@@ -43,6 +43,7 @@ import {
   Students,
   Teachers,
 } from "./Constants/Admin.constants";
+
 import AllCourses from "./Component/Admin/Course/AllCourses";
 import AllStudents from "./Component/Admin/Students/AllStudents";
 import AllTeachers from "./Component/Admin/Teachers/AllTeachers";

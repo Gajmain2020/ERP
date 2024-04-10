@@ -6,6 +6,8 @@ import imageToBase64 from "image-to-base64";
 import Students from "../models/student.model.js";
 import TGs from "../models/teacherGuardian.model.js";
 import StudentDetails from "../models/studentDetails.model.js";
+import TimeTableMap from "../models/timeTableMap.model.js";
+import TimeTable from "../models/timeTable.model.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 
@@ -594,6 +596,74 @@ export const fetchStudentAttendance = async (req, res) => {
       message: "Student attendance sent successfully.",
       success: true,
       attendance: studentInDB.attendance,
+    });
+  } catch (error) {
+    logOutError(error);
+    return res.status(500).json({
+      message: "Something went wrong. Please try again.",
+      success: false,
+    });
+  }
+};
+
+export const getStudentDetailsById = async (req, res) => {
+  try {
+    const { id } = req.query;
+
+    const studentInDB = await Students.findById(id).select(
+      "semester section department name"
+    );
+    if (!studentInDB) {
+      return res.status(404).json({
+        message: "Student not found. Invalid Operation.",
+        success: false,
+      });
+    }
+    return res.status(200).json({
+      message: "Operation completed successfully.",
+      success: true,
+      student: studentInDB,
+    });
+  } catch (error) {
+    logOutError(error);
+    return res.status(500).json({
+      message: "Something went wrong. Please try again.",
+      success: false,
+    });
+  }
+};
+
+export const getTimeTable = async (req, res) => {
+  try {
+    const { section, department, semester } = req.query;
+
+    const timeTableMapInDB = await TimeTableMap.findOne({
+      semester,
+      section,
+      department,
+    });
+
+    if (!timeTableMapInDB) {
+      console.log("broke");
+      return res.status(404).json({
+        message: "Time table is not published.",
+        success: false,
+      });
+    }
+
+    const timeTable = await TimeTable.findById(timeTableMapInDB.timeTable);
+
+    if (!timeTable) {
+      return res.status(404).json({
+        message: "Time table is not published.",
+        success: false,
+      });
+    }
+
+    return res.status(200).json({
+      message: "Operation Successful.",
+      success: true,
+      timeTable,
     });
   } catch (error) {
     logOutError(error);

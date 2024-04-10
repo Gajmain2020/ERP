@@ -13,6 +13,8 @@ import {
   deleteMultipleStudents,
   deleteSingleStudent,
   fetchStudentAttendance,
+  getTimeTable,
+  getStudentDetailsById,
 } from "../controllers/student.controller.js";
 import { uploadStudentProfilePhoto } from "../middlewares/multerUploadProfilePhotoStudent.middleware.js";
 
@@ -21,6 +23,7 @@ const router = Router();
 //basic routes
 router.route("/get-student-basic-details").get(getStudentBasicDetails);
 router.route("/fetch-student-details").get(getStudentDetails);
+router.route("/fetch-details-by-id").get(getStudentDetailsById);
 router.route("/fetch-all-students").get(fetchAllStudents);
 router.route("/login-student").post(loginStudent);
 router.route("/register-single-student").post(registerSingleStudent);
@@ -34,5 +37,7 @@ router.route("/delete-single-student").delete(deleteSingleStudent);
 router.route("/delete-multiple-students").delete(deleteMultipleStudents);
 
 router.route("/fetch-student-attendance").get(fetchStudentAttendance);
+
+router.route("/get-time-table").get(getTimeTable);
 
 export default router;
