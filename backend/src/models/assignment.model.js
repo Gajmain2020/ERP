@@ -15,11 +15,16 @@ const assignmentSchema = new mongoose.Schema(
     fileName: reqString,
     filePath: reqString,
     open: { type: Boolean, default: true },
+    department: reqString,
     submittedBy: [
       {
         studentId: String,
         studentName: String,
-        urn: String,
+        studentUrn: String,
+        assignment: {
+          fileName: String,
+          path: String,
+        },
       },
     ],
   },

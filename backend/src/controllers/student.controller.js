@@ -8,6 +8,7 @@ import TGs from "../models/teacherGuardian.model.js";
 import StudentDetails from "../models/studentDetails.model.js";
 import TimeTableMap from "../models/timeTableMap.model.js";
 import TimeTable from "../models/timeTable.model.js";
+import Assignments from "../models/assignment.model.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 
@@ -664,6 +665,65 @@ export const getTimeTable = async (req, res) => {
       message: "Operation Successful.",
       success: true,
       timeTable,
+    });
+  } catch (error) {
+    logOutError(error);
+    return res.status(500).json({
+      message: "Something went wrong. Please try again.",
+      success: false,
+    });
+  }
+};
+
+export const getAssignments = async (req, res) => {
+  try {
+    const { semester, section, department } = req.query;
+
+    const assignments = await Assignments.find({
+      semester,
+      section,
+      department,
+    }).select(
+      "subjectCode subjectShortName semester section open department submittedBy assignmentName"
+    );
+    return res.status(200).json({
+      message: `${assignments.length} assignments were successfully sent.`,
+      success: true,
+      assignments,
+    });
+  } catch (error) {
+    logOutError(error);
+    return res.status(500).json({
+      message: "Something went wrong. Please try again.",
+      success: false,
+    });
+  }
+};
+
+export const uploadAssignment = async (req, res) => {
+  try {
+    const file = req.file;
+    const { assignmentId, studentId } = req.body;
+
+    const student = await Students.findById(studentId).select("name urn");
+
+    const assignment = await Assignments.findById(assignmentId);
+
+    assignment.submittedBy.push({
+      studentId,
+      studentName: student.name,
+      studentUrn: student.urn,
+      assignment: {
+        fileName: file.filename,
+        path: file.destination,
+      },
+    });
+
+    await assignment.save();
+
+    return res.status(200).json({
+      message: "Assignment uploaded successfully.",
+      success: true,
     });
   } catch (error) {
     logOutError(error);

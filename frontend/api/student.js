@@ -120,3 +120,35 @@ export async function getTimeTableAPI(semester, section, department) {
     return error.response.data;
   }
 }
+
+export async function getAllAssignmentsAPI(semester, section, department) {
+  try {
+    const response = await axios({
+      headers,
+      method: "GET",
+      url:
+        studentUrl +
+        `/get-all-assignments?semester=${semester}&section=${section}&department=${department}`,
+    });
+    return response.data;
+  } catch (error) {
+    return error.response.data;
+  }
+}
+
+export async function uploadAssignmentAPI(formdata) {
+  try {
+    const response = await axios({
+      headers: {
+        ...headers,
+        "Content-Type": "multipart/form-data",
+      },
+      method: "POST",
+      url: studentUrl + "/upload-assignment",
+      data: formdata,
+    });
+    return response.data;
+  } catch (error) {
+    return error.response.data;
+  }
+}

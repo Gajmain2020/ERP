@@ -1,6 +1,7 @@
 import { Router } from "express";
-import { uploadAssignment } from "../middlewares/multerAssignment.middleware.js";
+import { uploadAssignmentStudent } from "../middlewares/multerAssignmentStudent.middleware.js";
 import {
+  uploadAssignment,
   editStudentDetails,
   getStudentBasicDetails,
   getStudentDetails,
@@ -15,6 +16,7 @@ import {
   fetchStudentAttendance,
   getTimeTable,
   getStudentDetailsById,
+  getAssignments,
 } from "../controllers/student.controller.js";
 import { uploadStudentProfilePhoto } from "../middlewares/multerUploadProfilePhotoStudent.middleware.js";
 
@@ -39,5 +41,10 @@ router.route("/delete-multiple-students").delete(deleteMultipleStudents);
 router.route("/fetch-student-attendance").get(fetchStudentAttendance);
 
 router.route("/get-time-table").get(getTimeTable);
+
+router.route("/get-all-assignments").get(getAssignments);
+router
+  .route("/upload-assignment")
+  .post(uploadAssignmentStudent.single("assignment"), uploadAssignment);
 
 export default router;
