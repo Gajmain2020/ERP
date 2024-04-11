@@ -107,10 +107,11 @@ export default function Attendance() {
     console.log("Handle sheet download triggered");
   }
 
+  console.log(attendanceToShow);
+
   return (
     <Wrapper>
       <Heading>Attendance</Heading>
-
       {/*//* Search and filter field */}
       <div className="flex justify-between w-full">
         <div className="mx-2">
@@ -142,7 +143,6 @@ export default function Attendance() {
           </button>
         </div>
       </div>
-
       {/*//* download sheet button*/}
       <div className="flex justify-end mx-5">
         <button
@@ -152,6 +152,34 @@ export default function Attendance() {
           <DownloadTwoToneIcon />
           Download
         </button>
+      </div>
+
+      {/* //* Percentage of total attendance */}
+
+      <div className="grid space-x-5 grid-cols-2 text-lg font-sub justify-center items-center bg-slate-600/60 text-gray-100 px-2 py-1 rounded ring">
+        <div className="grid h-full ">
+          <span className="flex justify-between">
+            <span>Total Classes</span>
+            <span>{attendanceToShow.length}</span>
+          </span>
+          <span className="flex justify-between">
+            <span>Attended Classes</span>
+            <span>
+              {attendanceToShow.filter((att) => att.present === true).length}
+            </span>
+          </span>
+        </div>
+        <div className="row-span-2 h-full flex items-center justify-between ">
+          <span>Grand Percentage</span>
+          <span>
+            {(
+              (attendanceToShow.filter((att) => att.present === true).length *
+                100) /
+              attendanceToShow.length
+            ).toFixed(2)}
+            %
+          </span>
+        </div>
       </div>
 
       {/*//* main table component button*/}
@@ -196,7 +224,6 @@ export default function Attendance() {
           </tbody>
         </table>
       </div>
-
       {/* //! utility for error and success snackbar */}
       {errorMessage !== "" && (
         <ErrSuccSnackbar

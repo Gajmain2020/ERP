@@ -719,7 +719,7 @@ function DetailsBackdropComponent({
             setErrorMessage(res.message);
             return;
           }
-
+          console.log(res);
           setStudentDetails(res.details);
           setImage(res.image);
         })

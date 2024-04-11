@@ -184,7 +184,7 @@ const sidebarButtonStyle =
   "w-full px-3 flex gap-5  text-md hover:bg-zinc-400/60 transition-all delay-150 hover:text-black rounded-lg py-2 active:outline-none active:ring active:ring-zinc-900/50 font-semibold items-center cursor-pointer";
 
 const sidebarComponentStyle =
-  "backdrop-blur fixed sm:hidden xs:hidden left-0 top-16 w-1/5 mt-2 xl:flex lg:flex md:flex border-rounded p-2 flex-col gap-2 min-h-[89vh] bg-white/30 text-white flex rounded-md";
+  "backdrop-blur fixed sm:hidden xs:hidden left-0 top-16 w-1/5 mt-2 xl:flex lg:flex md:flex border-rounded p-2 flex-col gap-2 min-h-[89vh] bg-white/30 text-white flex rounded-md ";
 
 const active = " bg-zinc-200/70 text-zinc-900";
 
@@ -295,7 +295,7 @@ function StudentSidebar() {
   const navigate = useNavigate();
 
   return (
-    <div className="flex overflow-auto">
+    <div className="flex overflow-auto ">
       <div className={sidebarComponentStyle}>
         <div
           onClick={() => navigate(baseUrl)}
