@@ -68,6 +68,7 @@ export const registerSingleStudent = asyncHandler(async (req, res) => {
 export const loginStudent = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
 
+  console.log(email, password);
   if (email === undefined || email === "" || password === undefined) {
     return res
       .status(403)
@@ -725,6 +726,42 @@ export const uploadAssignment = async (req, res) => {
       message: "Assignment uploaded successfully.",
       success: true,
     });
+  } catch (error) {
+    logOutError(error);
+    return res.status(500).json({
+      message: "Something went wrong. Please try again.",
+      success: false,
+    });
+  }
+};
+
+export const downloadAssignment = async (req, res) => {
+  try {
+    const { assignmentId } = req.query;
+
+    const assignmentInDB = await Assignments.findById(assignmentId);
+
+    if (!assignmentInDB) {
+      return res.status(404).json({
+        message: "Assignment not found in database.",
+        success: false,
+      });
+    }
+
+    res
+      .status(200)
+      .download(
+        assignmentInDB.filePath + "/" + assignmentInDB.fileName,
+        `${assignmentInDB.subjectShortName}_${assignmentInDB.assignmentName}_assignment.pdf`,
+        (err) => {
+          if (err) {
+            return res.status(404).json({
+              message: "File not found.",
+              success: false,
+            });
+          }
+        }
+      );
   } catch (error) {
     logOutError(error);
     return res.status(500).json({

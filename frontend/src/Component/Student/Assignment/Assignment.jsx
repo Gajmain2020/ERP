@@ -11,6 +11,7 @@ import Wrapper from "../../Common/Wrapper";
 import SuccErrSnackbar from "../../Common/SuccErrSnackbar";
 
 import {
+  downloadAssignmentAPI,
   fetchStudentDetailsById,
   getAllAssignmentsAPI,
   uploadAssignmentAPI,
@@ -36,7 +37,19 @@ export default function Assignment() {
   }, []);
 
   function handleDownloadAssignment(id) {
-    console.log(id);
+    const assignmentToDownload = assignments.find((ass) => ass._id === id);
+
+    const assignmentName = `${assignmentToDownload.subjectShortName}_${assignmentToDownload.assignmentName}_assignment.pdf`;
+
+    downloadAssignmentAPI(id, assignmentName)
+      .then((res) => {
+        if (res.success === false) {
+          setErrorMessage(res.message);
+          return;
+        }
+        setSuccessMessage(res.message);
+      })
+      .catch((err) => console.log(err));
   }
 
   return (

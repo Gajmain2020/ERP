@@ -17,6 +17,7 @@ import {
   getTimeTable,
   getStudentDetailsById,
   getAssignments,
+  downloadAssignment,
 } from "../controllers/student.controller.js";
 import { uploadStudentProfilePhoto } from "../middlewares/multerUploadProfilePhotoStudent.middleware.js";
 
@@ -46,5 +47,6 @@ router.route("/get-all-assignments").get(getAssignments);
 router
   .route("/upload-assignment")
   .post(uploadAssignmentStudent.single("assignment"), uploadAssignment);
+router.route("/download-assignment").get(downloadAssignment);
 
 export default router;

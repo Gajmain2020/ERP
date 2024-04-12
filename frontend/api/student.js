@@ -4,6 +4,7 @@ const studentUrl = "http://localhost:8000/api/v1/students";
 
 const headers = {
   "content-type": "application/json",
+
   token:
     localStorage.getItem("authToken") &&
     localStorage?.getItem("authToken") !== ""
@@ -51,6 +52,7 @@ export async function fetchStudentDetailsById(id) {
 }
 export async function loginStudent(data) {
   try {
+    console.log(data);
     const response = await axios({
       headers,
       url: studentUrl + "/login-student",
@@ -152,3 +154,33 @@ export async function uploadAssignmentAPI(formdata) {
     return error.response.data;
   }
 }
+
+export async function downloadAssignmentAPI(assignmentId, assignmentName) {
+  try {
+    const response = await axios({
+      responseType: "blob",
+      headers: { ...headers },
+      url: studentUrl + `/download-assignment?assignmentId=${assignmentId}`,
+      method: "GET",
+    });
+
+    // const res=await axios({})
+
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = assignmentName; // Filename for the downloaded file
+    document.body.appendChild(a);
+    a.click();
+
+    // Clean up by revoking the object URL
+    window.URL.revokeObjectURL(url);
+
+    // return response;
+  } catch (error) {
+    console.log(error);
+    return error.response.data;
+  }
+}
+
+// this is testing for the git
