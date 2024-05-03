@@ -20,6 +20,7 @@ import Diversity2Icon from "@mui/icons-material/Diversity2";
 import SupervisedUserCircleIcon from "@mui/icons-material/SupervisedUserCircle";
 
 import { Deparatments } from "../../Constants/Constants";
+import { useEffect, useState } from "react";
 
 const teacherSidebarOption = [
   {
@@ -188,33 +189,36 @@ const sidebarComponentStyle =
 
 const active = " bg-zinc-200/70 text-zinc-900";
 
-//! taking Base url for navigation
-var baseUrl = location.pathname.split("/");
-baseUrl = baseUrl.slice(0, 4).join("/") + "/";
-
 function Sidebar() {
+  const [baseUrl, setBaseUrl] = useState("");
+  useEffect(() => {
+    var tempBaseUrl = location.join("/");
+    tempBaseUrl = tempBaseUrl + "/";
+    setBaseUrl(tempBaseUrl);
+  }, []);
+
   const location = useLocation().pathname.split("/");
   const userType = location[1];
   const department = location[2];
   return (
     <>
-      {userType === "teacher" && <TeacherSidebar />}
-      {userType === "student" && <StudentSidebar />}
+      {userType === "teacher" && <TeacherSidebar baseUrl={baseUrl} />}
+      {userType === "student" && <StudentSidebar baseUrl={baseUrl} />}
       {(userType === "admin" || userType === "Admin") && (
-        <AdminSidebar department={department} />
+        <AdminSidebar department={department} baseUrl={baseUrl} />
       )}
     </>
   );
 }
 
-function AdminSidebar({ department }) {
+function AdminSidebar({ department, baseUrl }) {
   if (Deparatments.includes(department)) {
     return <DepartmentAdminSidebar department={department} />;
   }
   return <>hello world</>;
 }
 
-function DepartmentAdminSidebar({ department }) {
+function DepartmentAdminSidebar({ department, baseUrl }) {
   const navigate = useNavigate();
   return (
     <>
@@ -253,7 +257,7 @@ function DepartmentAdminSidebar({ department }) {
   );
 }
 
-function TeacherSidebar() {
+function TeacherSidebar({ baseUrl }) {
   const navigate = useNavigate();
 
   return (
@@ -280,6 +284,7 @@ function TeacherSidebar() {
                 title={option.title}
                 url={option.url}
                 icon={option.icon}
+                baseUrl={baseUrl}
               />
             ) : (
               <Divider />
@@ -291,7 +296,7 @@ function TeacherSidebar() {
   );
 }
 
-function StudentSidebar() {
+function StudentSidebar({ baseUrl }) {
   const navigate = useNavigate();
 
   return (
@@ -318,6 +323,7 @@ function StudentSidebar() {
                 title={option.title}
                 url={option.url}
                 icon={option.icon}
+                baseUrl={baseUrl}
               />
             ) : (
               <Divider />
@@ -337,7 +343,7 @@ function Divider() {
   );
 }
 
-function SidebarButton({ title, url, icon }) {
+function SidebarButton({ title, url, icon, baseUrl }) {
   const navigate = useNavigate();
 
   return (
