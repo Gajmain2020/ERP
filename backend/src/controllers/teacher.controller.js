@@ -7,6 +7,7 @@ import Teachers from "../models/teacher.model.js";
 import Notices from "../models/notice.model.js";
 import Assignments from "../models/assignment.model.js";
 import Students from "../models/student.model.js";
+import StudentDetails from "../models/studentDetails.model.js";
 
 const Month_Options = [
   "January",
@@ -28,6 +29,11 @@ function logOutError(error) {
   console.log(error);
   console.log("______________________________________________");
   console.log(error.message);
+}
+
+function base64_encode(file) {
+  var bitmap = fs.readFileSync(file);
+  return new Buffer(bitmap).toString("base64");
 }
 
 export const registerSingleTeacher = async (req, res) => {
@@ -797,6 +803,55 @@ export const addAttendance = async (req, res) => {
     });
   } catch (error) {
     logOutError(error);
+    return res.status(500).json({
+      message: "Something went wrong. Please try again.",
+      success: false,
+    });
+  }
+};
+
+export const fetchStudentDetails = async (req, res) => {
+  try {
+    const { rollNumber } = req.query;
+
+    const studentBasicDetails = await Students.findOne({
+      urn: rollNumber,
+    }).select("-password -attendance");
+    const studentDetails = await StudentDetails.findOne({
+      studentUrn: rollNumber,
+    });
+
+    if (!studentDetails) {
+      return res.status(404).json({
+        message: "Details not yet filled by student.",
+        success: false,
+      });
+    }
+    if (!studentBasicDetails) {
+      return res.status(404).json({
+        message: "Student not found.",
+        success: false,
+      });
+    }
+
+    const image = base64_encode(
+      studentDetails.profilePhoto.destination +
+        "/" +
+        studentDetails.profilePhoto.fileName
+    );
+
+    const studentData = {
+      studentBasicDetails,
+      studentDetails,
+      profilePhoto: image,
+    };
+
+    return res.status(200).json({
+      message: "Student details sent successfully",
+      studentData,
+      success: true,
+    });
+  } catch (error) {
     return res.status(500).json({
       message: "Something went wrong. Please try again.",
       success: false,

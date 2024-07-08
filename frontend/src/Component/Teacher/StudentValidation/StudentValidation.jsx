@@ -1,5 +1,6 @@
 /* eslint-disable react/prop-types */
 import jwtDecode from "jwt-decode";
+import { format } from "date-fns";
 
 import Heading from "../../Common/Heading";
 import Wrapper from "../../Common/Wrapper";
@@ -11,7 +12,10 @@ import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
 import RemoveRedEyeOutlinedIcon from "@mui/icons-material/RemoveRedEyeOutlined";
 import CloseIcon from "@mui/icons-material/Close";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
-import { fetchStudentsByTGAPI } from "../../../../api/teacher";
+import {
+  fetchStudentDetailsAPI,
+  fetchStudentsByTGAPI,
+} from "../../../../api/teacher";
 
 function StudentValidation() {
   const isTG = jwtDecode(localStorage.getItem("authToken")).isTG || false;
@@ -208,15 +212,47 @@ function TableRow({
 }
 
 function BackdropComponent({ rollNumber, setRollNumber, verifyStudent }) {
-  const [studentDetails, setStudnetDetails] = useState(null);
+  const [studentDetails, setStudentDetails] = useState(null);
+  const [apiCalled, setApiCalled] = useState(false);
 
   useEffect(() => {
-    console.log("i got triggered");
-    //make api call to fetch student details from server and get the details and store them to STUDNET DETAILS
+    setApiCalled(true);
+    fetchStudentDetailsAPI(rollNumber)
+      .then((res) => setStudentDetails(res.studentData))
+      .catch((err) => alert(err.message))
+      .finally(() => setApiCalled(false));
   }, [rollNumber]);
 
   function handleCloseBackdrop() {
     setRollNumber(() => "-1");
+  }
+
+  if (apiCalled || !studentDetails) {
+    return (
+      <div className="fixed top-0 left-0 w-[100%] h-[100vh] backdrop-blur bg-gray-900/50">
+        <div className="flex mt-10 justify-center items-center h-[100%]">
+          <div className="bg-gray-100/40 lg:h-5/6 md:h-2/3 xs:overflow-auto lg:w-2/3 md:w-2/3 sm:w-3/4 xs:w-5/6 xs:h-[90vh] sm:[80vh] rounded-md ">
+            {/* CLOSE BUTTON */}
+            <div className="flex items-between justify-end">
+              <button
+                onClick={handleCloseBackdrop}
+                className="mr-2 mt-2 flex items-between bg-gray-700/80 rounded-sm px-2 py-0.5"
+              >
+                <CloseIcon color="error" />
+              </button>
+            </div>
+            <div className="flex justify-center items-center h-1/2">
+              <div className="flex flex-row gap-3">
+                <div className="w-4 h-4 rounded-full bg-blue-700 animate-bounce"></div>
+                <div className="w-4 h-4 rounded-full bg-blue-700 animate-bounce [animation-delay:-.2s]"></div>
+                <div className="w-4 h-4 rounded-full bg-blue-700 animate-bounce [animation-delay:-.4s]"></div>
+                <div className="w-4 h-4 rounded-full bg-blue-700 animate-bounce [animation-delay:-6s]"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -233,7 +269,9 @@ function BackdropComponent({ rollNumber, setRollNumber, verifyStudent }) {
             </button>
           </div>
 
-          <Heading>Gajendra&apos;s Details</Heading>
+          <Heading>
+            {studentDetails.studentBasicDetails.name}&apos;s Details
+          </Heading>
 
           {/* MAIN FORM FOR INPUT */}
           <div className="flex px-5 flex-col mt-2">
@@ -247,61 +285,81 @@ function BackdropComponent({ rollNumber, setRollNumber, verifyStudent }) {
             </div>
             <div className="text-lg  px-2 mt-3 grid gap-2 lg:grid-cols-3 md:grid-cols-2 sm:grid-cols-1 xs:grid-cols-1">
               <div className="truncate border-b-2 hover:bg-gray-200 rounded-md">
-                <strong>Name: </strong> Gajendra Sahu
+                <strong>Name: </strong>{" "}
+                {studentDetails.studentBasicDetails.name}
               </div>
               <div className=" border-b-2 hover:bg-gray-200/20 rounded-md">
-                <strong>Email: </strong> gajmain2020@gmail.com
+                <strong>Email: </strong>{" "}
+                {studentDetails.studentBasicDetails.email}
               </div>
               <div className="truncate border-b-2 hover:bg-gray-200/20 rounded-md">
-                <strong>URN: </strong> 300102221021
+                <strong>URN: </strong> {studentDetails.studentBasicDetails.urn}
               </div>
               <div className="truncate border-b-2 hover:bg-gray-200/20 rounded-md">
-                <strong>CRN: </strong> B-12
+                <strong>CRN: </strong> {studentDetails.studentBasicDetails.crn}
               </div>
               <div className="truncate border-b-2 hover:bg-gray-200/20 rounded-md">
-                <strong>Mobile: </strong> 7975611308
+                <strong>Mobile: </strong>{" "}
+                {studentDetails.studentDetails.studentMobileNumber}
               </div>
               <div className="truncate border-b-2 hover:bg-gray-200/20 rounded-md">
-                <strong>Department: </strong> CSE
+                <strong>Department: </strong>{" "}
+                {studentDetails.studentBasicDetails.department}
               </div>
               <div className=" border-b-2 hover:bg-gray-200/20 rounded-md">
-                <strong>Admission No.: </strong> 2101010406
+                <strong>Admission No.: </strong>{" "}
+                {studentDetails.studentDetails.admissionNumber}
               </div>
               <div className="truncate  border-b-2 hover:bg-gray-200/20 rounded-md">
-                <strong>Sem / Sec: </strong> V / B
+                <strong>Sem / Sec: </strong>{" "}
+                {studentDetails.studentBasicDetails.semester} /{" "}
+                {studentDetails.studentBasicDetails.section}
               </div>
               <div className="truncate border-b-2 hover:bg-gray-200/20 rounded-md">
-                <strong>DOB: </strong> 23/09/2002
+                <strong>DOB: </strong>{" "}
+                {format(
+                  new Date(studentDetails.studentDetails.dob),
+                  "dd-MM-yyyy"
+                )}
               </div>
               <div className="truncate border-b-2 hover:bg-gray-200/20 rounded-md">
-                <strong>Blood Group: </strong> O+
+                <strong>Blood Group: </strong>{" "}
+                {studentDetails.studentDetails.bloodGroup}
               </div>
               <div className="truncate border-b-2 hover:bg-gray-200/20 rounded-md">
-                <strong>Category: </strong> OBC
+                <strong>Category: </strong>{" "}
+                {studentDetails.studentDetails.category}
               </div>
               <div className="truncate border-b-2 hover:bg-gray-200/20 rounded-md">
-                <strong>Gender: </strong> Male
+                <strong>Gender: </strong>{" "}
+                {studentDetails.studentDetails.gender.charAt(0).toUpperCase() +
+                  studentDetails.studentDetails.gender.slice(1)}
               </div>
               <div className="truncate border-b-2 hover:bg-gray-200/20 rounded-md">
-                <strong>Aadhar: </strong> 123123123123
+                <strong>Aadhar: </strong>{" "}
+                {studentDetails.studentDetails.aadharNumber}
               </div>
               <div className="truncate border-b-2 flex items-center hover:bg-gray-200/20 rounded-md">
                 <strong>F. Name: </strong> &nbsp;
                 <div className="flex flex-col overflow-auto no-scrollbar">
-                  <div>Om Prakash Sahu</div>
-                  <div className="text-sm my-0">+91 7975611308</div>
+                  <div>{studentDetails.studentDetails.fatherName}</div>
+                  <div className="text-sm my-0">
+                    +91 {studentDetails.studentDetails.fatherMobileNumber}
+                  </div>
                 </div>
               </div>
               <div className="truncate flex items-center border-b-2 hover:bg-gray-200/20 rounded-md">
                 <strong>M. Name: </strong> &nbsp;
                 <div className="flex flex-col">
-                  <div>Malti Devi Sahu</div>
-                  <div className="text-sm my-0">+91 7975611308</div>
+                  <div>{studentDetails.studentDetails.motherName}</div>
+                  <div className="text-sm my-0">
+                    +91 {studentDetails.studentDetails.motherMobileNumber}
+                  </div>
                 </div>
               </div>
               <div className="border-b-2 hover:bg-gray-200/20 rounded-md">
-                <strong>Address:</strong> At. Po. Gorkha, Jindal Road, Raigarh,
-                Chhattisgarh, 496001
+                <strong>Address:</strong>{" "}
+                {studentDetails.studentDetails.address}
               </div>
             </div>
           </div>

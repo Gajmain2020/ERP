@@ -147,3 +147,16 @@ export async function addAttendanceAPI(teacherId, students, searchData, cls) {
     return error.response.data;
   }
 }
+
+export async function fetchStudentDetailsAPI(rollNumber) {
+  try {
+    const response = await axios({
+      headers,
+      url: teacherUrl + `/fetch-student-details?rollNumber=${rollNumber}`,
+      method: "GET",
+    });
+    return response.data;
+  } catch (error) {
+    return error.response.data;
+  }
+}

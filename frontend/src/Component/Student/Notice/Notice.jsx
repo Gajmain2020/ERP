@@ -1,5 +1,5 @@
 import Wrapper from "../../Common/Wrapper";
 
 export default function Notice() {
-  return <Wrapper>sdkjsd</Wrapper>;
+  return <Wrapper>Coming soon In BIT BUDDY</Wrapper>;
 }

@@ -17,6 +17,7 @@ import {
   fetchClass,
   downloadAttendanceCSV,
   addAttendance,
+  fetchStudentDetails,
 } from "../controllers/teacher.controller.js";
 import { uploadNotice } from "../middlewares/multerNotice.middleware.js";
 import { uploadAssignment } from "../middlewares/multerAssignment.middleware.js";
@@ -57,5 +58,6 @@ router.route("/get-all-students-by-department").get(getAllStudentsByDepartment);
 
 //! teacher guardian routes
 router.route("/fetch-student-tg").get(fetchStudentsByTG);
+router.route("/fetch-student-details").get(fetchStudentDetails);
 
 export default router;
