@@ -21,7 +21,10 @@ import {
 } from "../controllers/teacher.controller.js";
 import { uploadNotice } from "../middlewares/multerNotice.middleware.js";
 import { uploadAssignment } from "../middlewares/multerAssignment.middleware.js";
-import { fetchStudentsByTG } from "../controllers/teacherGuardian.controller.js";
+import {
+  fetchStudentsByTG,
+  verifySingleStudent,
+} from "../controllers/teacherGuardian.controller.js";
 
 const router = Router();
 
@@ -59,5 +62,6 @@ router.route("/get-all-students-by-department").get(getAllStudentsByDepartment);
 //! teacher guardian routes
 router.route("/fetch-student-tg").get(fetchStudentsByTG);
 router.route("/fetch-student-details").get(fetchStudentDetails);
+router.route("/verify-single-student").patch(verifySingleStudent);
 
 export default router;

@@ -269,3 +269,30 @@ export const fetchStudentsByTG = async (req, res) => {
     });
   }
 };
+
+export const verifySingleStudent = async (req, res) => {
+  try {
+    const { rollNumber } = req.query;
+    const studentInDB = await Students.findOne({
+      urn: rollNumber,
+    });
+    studentInDB.ifVerified = true;
+    await studentInDB.save();
+    const TG = await TGs.findOne({ teacherId: studentInDB.TG.teacherId });
+    for (let i = 0; i < TG.studentsUnderTG.length; i++) {
+      if (TG.studentsUnderTG[i].urn === rollNumber) {
+        TG.studentsUnderTG[i].verified = true;
+      }
+    }
+    await TG.save();
+    return res.status(200).json({
+      message: "Student verified successfully.",
+      success: true,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Something went wrong. Please try again.",
+      success: false,
+    });
+  }
+};

@@ -1,20 +1,23 @@
 /* eslint-disable react/prop-types */
+import { useEffect, useState } from "react";
 import jwtDecode from "jwt-decode";
 import { format } from "date-fns";
 
 import Heading from "../../Common/Heading";
 import Wrapper from "../../Common/Wrapper";
 import UnauthorizedPage from "../../Common/UnauthorizedPage";
-import { useEffect, useState } from "react";
+import ErrSuccSnackbar from "../../Common/ErrSuccSnackbar";
 
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
 import RemoveRedEyeOutlinedIcon from "@mui/icons-material/RemoveRedEyeOutlined";
 import CloseIcon from "@mui/icons-material/Close";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
+
 import {
   fetchStudentDetailsAPI,
   fetchStudentsByTGAPI,
+  verifySingleStudentAPI,
 } from "../../../../api/teacher";
 
 function StudentValidation() {
@@ -27,6 +30,7 @@ function StudentValidation() {
   const [firstLoad, setFirstLoad] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+  const [warningMessage, setWarningMessage] = useState("");
 
   useEffect(() => {
     if (students.length === 0) {
@@ -50,18 +54,40 @@ function StudentValidation() {
   }, [isTG]);
 
   function verifyStudent(rollNumber) {
-    console.log("student verification");
-    //make api call to verify student in the database
-    console.log(rollNumber);
+    //! will make api call to verify that student in the database
+    setWarningMessage("Studen verification under process.");
+    setRollNumber(-1);
+    verifySingleStudentAPI(rollNumber)
+      .then((res) => {
+        if (!res.success) {
+          setErrorMessage(res.message);
+          return;
+        }
+        setSuccessMessage(res.message);
+        //* make the change in the table as well
+        setStudents.map((student) => {
+          if (student.urn === rollNumber) return { ...student, verified: true };
+          return { ...student };
+        });
+      })
+      .catch((err) => setErrorMessage(err))
+      .finally(() => setApiCalled(false));
   }
 
   function viewStudentDetails(rollNumber) {
-    console.log("view single student details");
     setRollNumber(rollNumber);
   }
 
   return (
     <Wrapper>
+      <ErrSuccSnackbar
+        errorMessage={errorMessage}
+        setErrorMessage={setErrorMessage}
+        successMessage={successMessage}
+        setSuccessMessage={setSuccessMessage}
+        warningMessage={warningMessage}
+        setWraningMessage={setWarningMessage}
+      />
       <Heading>Validate Students</Heading>
       {!isTG ? (
         <UnauthorizedPage />
@@ -164,9 +190,9 @@ function TableRow({
           {verified ? (
             <button
               disabled
-              className="py-1 w-full border px-3 rounded-md bg-gray-600 font-semibold cursor-not-allowed"
+              className="py-1 w-full border px-3 rounded-md bg-green-600 font-semibold cursor-not-allowed"
             >
-              Verified
+              ✔️ Verified
             </button>
           ) : !detailsFilled ? (
             <span className="text-red-300 text-xs">
@@ -273,14 +299,14 @@ function BackdropComponent({ rollNumber, setRollNumber, verifyStudent }) {
             {studentDetails.studentBasicDetails.name}&apos;s Details
           </Heading>
 
-          {/* MAIN FORM FOR INPUT */}
+          {/* MAIN Student Details FOR INPUT */}
           <div className="flex px-5 flex-col mt-2">
             <div className="flex flex-1 justify-center">
               <img
-                src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png"
+                src={`data:image/jpeg;base64,${studentDetails.profilePhoto}`}
                 alt="studnet name"
-                className="rounded-full"
-                width={100}
+                className="rounded-full aspect-square"
+                width={150}
               />
             </div>
             <div className="text-lg  px-2 mt-3 grid gap-2 lg:grid-cols-3 md:grid-cols-2 sm:grid-cols-1 xs:grid-cols-1">
@@ -359,13 +385,17 @@ function BackdropComponent({ rollNumber, setRollNumber, verifyStudent }) {
               </div>
               <div className="border-b-2 hover:bg-gray-200/20 rounded-md">
                 <strong>Address:</strong>{" "}
-                {studentDetails.studentDetails.address}
+                {studentDetails.studentDetails.permanentAddress.address +
+                  ", " +
+                  studentDetails.studentDetails.permanentAddress.state +
+                  " - " +
+                  studentDetails.studentDetails.permanentAddress.pinCode}
               </div>
             </div>
           </div>
 
           {/* CLOSE AND VERIFY BUTTON */}
-          <div className="flex justify-around lg:my-10 md:my-10 sm:my-5 gap-5 mx-10 xs:my-5">
+          <div className="flex justify-around lg:my-6 md:my-6 sm:my-5 gap-5 mx-10 xs:my-5">
             <button
               onClick={() => verifyStudent(rollNumber)}
               className="border bg-green-700/70 hover:text-gray-100 hover:bg-green-700/90 transition px-8 flex-1 py-1 font-semibold rounded-md "

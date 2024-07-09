@@ -6,6 +6,8 @@ export default function ErrSuccSnackbar({
   setSuccessMessage,
   errorMessage,
   setErrorMessage,
+  warningMessage,
+  setWraningMessage,
 }) {
   return (
     <>
@@ -17,9 +19,24 @@ export default function ErrSuccSnackbar({
         <Alert
           onClose={() => setSuccessMessage("")}
           severity="success"
+          variant="filled"
           sx={{ width: "100%" }}
         >
           {successMessage}
+        </Alert>
+      </Snackbar>
+      <Snackbar
+        open={warningMessage !== ""}
+        autoHideDuration={3200}
+        onClose={() => setWraningMessage("")}
+      >
+        <Alert
+          onClose={() => setWraningMessage("")}
+          severity="warning"
+          variant="filled"
+          sx={{ width: "100%" }}
+        >
+          {warningMessage}
         </Alert>
       </Snackbar>
       <Snackbar
@@ -30,6 +47,7 @@ export default function ErrSuccSnackbar({
         <Alert
           onClose={() => setErrorMessage("")}
           severity="error"
+          variant="filled"
           sx={{ width: "100%" }}
         >
           {errorMessage}

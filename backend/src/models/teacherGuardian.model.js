@@ -20,6 +20,7 @@ const teacherGuardianSchema = new Schema(
         section: String,
         crn: String,
         isDetailsFilled: { type: Boolean, default: false },
+        verified: { type: Boolean, default: false },
       },
     ],
   },

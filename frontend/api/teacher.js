@@ -160,3 +160,16 @@ export async function fetchStudentDetailsAPI(rollNumber) {
     return error.response.data;
   }
 }
+
+export async function verifySingleStudentAPI(rollNumber) {
+  try {
+    const response = await axios({
+      headers,
+      url: teacherUrl + `/verify-single-student?rollNumber=${rollNumber}`,
+      method: "PATCH",
+    });
+    return response.data;
+  } catch (error) {
+    return error.response.data;
+  }
+}
